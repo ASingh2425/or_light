@@ -1,0 +1,16 @@
+ORANGE ZONE — RADIO COMMUNICATION SECTOR
+TOWER OPERATOR SHIFT LOG — 2026-09-17
+
+03:13:58   Routine traffic. Diagnostic rail is quiet except for the green bars.
+03:14:02   THE ALERT went out — "citywide emergency".
+03:14:08   Nobody touched this console. I repeat: NOBODY issued it.
+03:14:08   For six seconds, an off-net peer kept calling the tower. I could not
+           match the peer to any registered station.
+03:14:14   The calls stopped. Sector staff evacuated toward Civic.
+
+CAPTURE: radio_intercept_2026-09-17.pcap (03:13:58 – 03:14:22 UTC)
+
+I copied the console photo before I left. The green rail was still moving.
+Do not trust the first flag-shaped thing you find.
+The wire remembers the order of the pings, and the console remembers what
+wasn't written on the screen.

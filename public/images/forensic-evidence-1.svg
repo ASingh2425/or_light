@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="accent1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg1)"/>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#4338ca" stroke-width="1" stroke-opacity="0.4"/>
+  </pattern>
+  <rect width="800" height="600" fill="url(#grid)"/>
+
+  <!-- Forensic Banner -->
+  <rect x="30" y="30" width="740" height="65" rx="8" fill="#3730a3" stroke="#f97316" stroke-width="2"/>
+  <text x="50" y="62" font-family="monospace" font-size="14" fill="#fb923c" font-weight="bold">CRIME SCENE EVIDENCE ITEM #01 — DISK IMAGE RECOVERY</text>
+  <text x="50" y="82" font-family="monospace" font-size="12" fill="#e0e7ff">ITEM: vault_terminal.img (raw dd, 2 MiB) | SECTOR_LOCKDOWN 03:14:40 UTC</text>
+
+  <!-- eMMC block map -->
+  <rect x="50" y="120" width="320" height="260" rx="10" fill="#2e1065" stroke="#a855f7" stroke-width="2"/>
+  <text x="70" y="145" font-family="monospace" font-size="12" fill="#c084fc" font-weight="bold">[eMMC BLOCK MAP — 512B BOUNDARIES]</text>
+  <!-- block grid -->
+  <g stroke="#4338ca" stroke-width="1" fill="#1e1b4b">
+    <rect x="70" y="165" width="44" height="28"/><rect x="122" y="165" width="44" height="28"/>
+    <rect x="174" y="165" width="44" height="28"/><rect x="226" y="165" width="44" height="28"/>
+    <rect x="278" y="165" width="44" height="28"/>
+    <rect x="70" y="201" width="44" height="28"/><rect x="122" y="201" width="44" height="28"/>
+    <rect x="174" y="201" width="44" height="28"/><rect x="226" y="201" width="44" height="28"/>
+    <rect x="278" y="201" width="44" height="28"/>
+  </g>
+  <!-- three surviving allocations -->
+  <rect x="70" y="237" width="44" height="28" fill="#047857" stroke="#4ade80" stroke-width="2"/>
+  <rect x="174" y="237" width="44" height="28" fill="#047857" stroke="#4ade80" stroke-width="2"/>
+  <rect x="278" y="237" width="44" height="28" fill="#047857" stroke="#4ade80" stroke-width="2"/>
+  <text x="92" y="255" font-family="monospace" font-size="9" fill="#4ade80" text-anchor="middle">1</text>
+  <text x="196" y="255" font-family="monospace" font-size="9" fill="#4ade80" text-anchor="middle">2</text>
+  <text x="300" y="255" font-family="monospace" font-size="9" fill="#4ade80" text-anchor="middle">3</text>
+  <text x="210" y="290" font-family="monospace" font-size="11" fill="#f43f5e" text-anchor="middle" font-weight="bold">PURGE REPORTED: PLAINTEXT UNRECOVERABLE</text>
+  <text x="210" y="315" font-family="monospace" font-size="11" fill="#facc15" text-anchor="middle">...the purge lied. 3 allocations survive.</text>
+  <text x="210" y="355" font-family="monospace" font-size="10" fill="#93c5fd" text-anchor="middle">image → photograph → document</text>
+  <text x="210" y="372" font-family="monospace" font-size="10" fill="#93c5fd" text-anchor="middle">read in order</text>
+
+  <!-- Carving session output -->
+  <rect x="390" y="120" width="360" height="260" rx="10" fill="#1e1b4b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="410" y="145" font-family="monospace" font-size="12" fill="#38bdf8" font-weight="bold">[CARVING SESSION — binwalk -e]</text>
+  <text x="410" y="180" font-family="monospace" font-size="10" fill="#93c5fd">&gt; DECIMAL   HEXADECIMAL   DESCRIPTION</text>
+  <text x="410" y="205" font-family="monospace" font-size="10" fill="#4ade80">&gt; 512       0x200         PNG image, 96x96</text>
+  <text x="410" y="230" font-family="monospace" font-size="10" fill="#facc15">&gt; 18432     0x4800        JPEG image data</text>
+  <text x="410" y="255" font-family="monospace" font-size="10" fill="#fb923c">&gt; 22016     0x5600        PDF document</text>
+  <text x="410" y="280" font-family="monospace" font-size="10" fill="#cbd5e1">&gt; carving complete: 3 files recovered</text>
+  <text x="410" y="315" font-family="monospace" font-size="11" fill="#38bdf8" font-weight="bold">&gt;&gt; FRAGMENT TARGET: HIST_001 TO HIST_090</text>
+  <rect x="410" y="335" width="320" height="30" rx="4" fill="#047857"/>
+  <text x="420" y="355" font-family="monospace" font-size="11" fill="#ffffff" font-weight="bold">LOCKDOWN CODE: MANU{████████████████}</text>
+
+  <!-- Lower Forensic Stamp -->
+  <rect x="50" y="410" width="700" height="150" rx="8" fill="#312e81" stroke="#e0e7ff" stroke-width="1"/>
+  <circle cx="120" cy="485" r="50" fill="none" stroke="#f59e0b" stroke-width="4"/>
+  <text x="120" y="480" font-family="monospace" font-size="11" fill="#f59e0b" text-anchor="middle" font-weight="bold">FORENSIC</text>
+  <text x="120" y="496" font-family="monospace" font-size="10" fill="#f59e0b" text-anchor="middle">VERIFIED</text>
+  <text x="200" y="450" font-family="monospace" font-size="14" fill="#ffffff" font-weight="bold">CIVIC FORENSIC DIVISION — ORANGE ZONE VAULT EVIDENCE</text>
+  <text x="200" y="475" font-family="monospace" font-size="11" fill="#93c5fd">Custodian: Dr. Aris Vane | Acquired 03:52 UTC via console port</text>
+  <text x="200" y="500" font-family="monospace" font-size="11" fill="#cbd5e1">Raw dd image of sub-level terminal eMMC, slot B.</text>
+  <text x="200" y="530" font-family="monospace" font-size="12" fill="#fb923c" font-weight="bold">STATUS: READY FOR DATASET FRAGMENT EXTRACTION</text>
+</svg>

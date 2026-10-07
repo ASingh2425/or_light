@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#065f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg5)"/>
+  <rect x="30" y="30" width="740" height="65" rx="8" fill="#047857" stroke="#6ee7b7" stroke-width="2"/>
+  <text x="50" y="62" font-family="monospace" font-size="14" fill="#a7f3d0" font-weight="bold">CRIME SCENE EVIDENCE ITEM #05 — RESEARCH WING SURVIVAL MODEL</text>
+  <text x="50" y="82" font-family="monospace" font-size="12" fill="#d1fae5">SECTOR 05: Ground Truth Continuous Survival Probability Target &amp; ML Architecture</text>
+
+  <!-- Regression Curve Visual -->
+  <rect x="50" y="120" width="700" height="320" rx="10" fill="#065f46" stroke="#34d399" stroke-width="2"/>
+  <text x="70" y="150" font-family="monospace" font-size="12" fill="#a7f3d0" font-weight="bold">[CONTINUOUS SURVIVAL PROBABILITY REGRESSION CURVE]</text>
+  <!-- Graph axes -->
+  <line x1="100" y1="360" x2="680" y2="360" stroke="#d1fae5" stroke-width="2"/>
+  <line x1="100" y1="180" x2="100" y2="360" stroke="#d1fae5" stroke-width="2"/>
+  <text x="60" y="190" font-family="monospace" font-size="10" fill="#d1fae5">1.0</text>
+  <text x="60" y="270" font-family="monospace" font-size="10" fill="#d1fae5">0.5</text>
+  <text x="60" y="360" font-family="monospace" font-size="10" fill="#d1fae5">0.0</text>
+
+  <!-- Sigmoid curve -->
+  <path d="M 100 350 Q 250 340 380 270 T 660 190" fill="none" stroke="#facc15" stroke-width="4"/>
+  <!-- Scatter dots -->
+  <circle cx="150" cy="340" r="4" fill="#6ee7b7"/>
+  <circle cx="210" cy="330" r="4" fill="#6ee7b7"/>
+  <circle cx="280" cy="310" r="4" fill="#6ee7b7"/>
+  <circle cx="340" cy="285" r="4" fill="#6ee7b7"/>
+  <circle cx="410" cy="250" r="4" fill="#6ee7b7"/>
+  <circle cx="480" cy="225" r="4" fill="#6ee7b7"/>
+  <circle cx="560" cy="205" r="4" fill="#6ee7b7"/>
+  <circle cx="630" cy="195" r="4" fill="#6ee7b7"/>
+
+  <text x="70" y="395" font-family="monospace" font-size="13" fill="#facc15" font-weight="bold">&gt;&gt; FINAL KEY: MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}</text>
+  <text x="70" y="420" font-family="monospace" font-size="11" fill="#d1fae5">UNLOCKED: Fragment 5 (Records HIST_361 to HIST_450) + Full 450 Dataset Compilation</text>
+
+  <!-- Bottom Box -->
+  <rect x="50" y="460" width="700" height="100" rx="8" fill="#047857" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="70" y="495" font-family="monospace" font-size="13" fill="#ffffff" font-weight="bold">FINAL FORENSIC CONVERGENCE</text>
+  <text x="70" y="520" font-family="monospace" font-size="11" fill="#d1fae5">All 5 fragments combine into the master dataset for machine learning regression.</text>
+</svg>

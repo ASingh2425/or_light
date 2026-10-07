@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764"/>
+      <stop offset="100%" stop-color="#581c87"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg3)"/>
+  <rect x="30" y="30" width="740" height="65" rx="8" fill="#6b21a8" stroke="#d8b4fe" stroke-width="2"/>
+  <text x="50" y="62" font-family="monospace" font-size="14" fill="#e9d5ff" font-weight="bold">CRIME SCENE EVIDENCE ITEM #03 — PRALAYA DEFENSE CORE</text>
+  <text x="50" y="82" font-family="monospace" font-size="12" fill="#f5d0fe">SECTOR 03: Protective Record Falsification Validation &amp; Memory Core Audit</text>
+
+  <!-- Hex Dump View -->
+  <rect x="50" y="120" width="700" height="320" rx="10" fill="#4c1d95" stroke="#c084fc" stroke-width="2"/>
+  <text x="70" y="150" font-family="monospace" font-size="12" fill="#f0abfc" font-weight="bold">[MEMORY CORE HEX INSPECTION &amp; AUDIT LOG]</text>
+  <text x="70" y="180" font-family="monospace" font-size="11" fill="#e9d5ff">0x00A0: 4D 41 4E 55 5F 50 52 41 4C 41 59 41 5F 43 4F 52 | MANU_PRALAYA_COR</text>
+  <text x="70" y="205" font-family="monospace" font-size="11" fill="#e9d5ff">0x00B0: 44 49 41 47 4E 4F 53 54 49 43 5F 54 52 55 45 21 | DIAGNOSTIC_TRUE!</text>
+  <text x="70" y="230" font-family="monospace" font-size="11" fill="#a7f3d0">0x00C0: 50 52 4F 54 45 43 54 49 56 45 5F 53 50 4C 49 54 | PROTECTIVE_SPLIT</text>
+  <text x="70" y="255" font-family="monospace" font-size="11" fill="#fde047">0x00D0: 4E 4F 54 5F 53 41 42 4F 54 41 47 45 5F 56 41 4C | NOT_SABOTAGE_VAL</text>
+  <text x="70" y="280" font-family="monospace" font-size="11" fill="#e9d5ff">0x00E0: 46 41 4C 53 49 46 49 45 44 5F 54 4F 5F 50 52 4F | FALSIFIED_TO_PRO</text>
+  <text x="70" y="315" font-family="monospace" font-size="12" fill="#4ade80" font-weight="bold">&gt;&gt; VERDICT: AUDIT PASSED (99.4% INTEGRITY CONFIDENCE)</text>
+  <text x="70" y="340" font-family="monospace" font-size="12" fill="#facc15" font-weight="bold">&gt;&gt; KEY: MANU{pr073c71v3_f4ls1f1c4710n_v4l1d}</text>
+  <text x="70" y="375" font-family="monospace" font-size="11" fill="#cbd5e1">FRAGMENT UNLOCKED: Records HIST_181 to HIST_270 (Technical &amp; Resilience Index)</text>
+
+  <!-- Bottom Details -->
+  <rect x="50" y="460" width="700" height="100" rx="8" fill="#581c87" stroke="#d8b4fe" stroke-width="1"/>
+  <text x="70" y="495" font-family="monospace" font-size="13" fill="#ffffff" font-weight="bold">EVIDENCE SUMMARY</text>
+  <text x="70" y="520" font-family="monospace" font-size="11" fill="#e9d5ff">The data alterations were engineered to shield subjects from automated tracking.</text>
+</svg>

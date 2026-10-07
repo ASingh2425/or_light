@@ -1,0 +1,20 @@
+ORANGE ZONE — CIVIC EVIDENCE VAULT
+CHAIN OF CUSTODY RECORD — CASE 450 / PRALAYA
+
+ITEM:     vault_terminal.img
+SOURCE:   vault sub-level terminal, eMMC slot B (raw dd image, 2 MiB)
+ACQUIRED: 2026-09-17 03:52 UTC — after SECTOR_LOCKDOWN purge
+
+INSPECTOR NOTE:
+  The purge reported "plaintext unrecoverable". It lied.
+  The lockdown code was written in three places before the wipe:
+
+    1. the image        (carved first)
+    2. the photograph   (carved second)
+    3. the document     (carved third)
+
+  Each carrier hides one piece of the code. Recover all three and
+  read them IN ORDER — the code reassembles whole.
+
+  Carving tip:     binwalk -e vault_terminal.img   (or: foremost)
+  Boundary hint:   every allocation begins on a 512-byte boundary.
