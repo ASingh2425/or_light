@@ -67,19 +67,22 @@ export const FinaleOverlay: React.FC = () => {
       <div className="absolute inset-0 pointer-events-none finale-flash" />
 
       <div className="relative w-full max-w-xl border-2 border-cyber-green/50 bg-cyber-darker/95 rounded-2xl shadow-[0_0_60px_rgba(0,255,136,0.35)] overflow-hidden finale-panel-in">
+        {/* Rainbow convergence bar */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-green-400 via-cyan-400 via-50% to-fuchsia-500" />
         <div className="crt-overlay absolute inset-0 pointer-events-none" />
 
-        <div className="relative px-6 pt-6 pb-5 border-b border-cyber-green/25">
+        <div className="relative px-6 pt-5 pb-5 border-b border-cyber-green/25">
           <div className="flex items-center gap-2 text-[10px] font-bold text-cyber-green uppercase tracking-[0.3em]">
             <Rocket className="w-4 h-4" />
             First Passage Authorized
           </div>
-          <h2 className="mt-3 text-2xl md:text-3xl font-black text-white uppercase tracking-wider">
+          <h2 className="mt-3 text-2xl md:text-3xl font-black uppercase tracking-wider bg-gradient-to-r from-green-300 via-cyan-200 to-fuchsia-400 bg-clip-text text-transparent">
             Archive Convergence Complete
           </h2>
           <p className="mt-2 text-xs text-gray-400 leading-relaxed">
             All four live sectors poured their beams into the core. Recover the final
-            fragment below, then step through the portal to the next site.
+            fragment below — nothing redirects on its own, the portal only opens when
+            you press the button.
           </p>
         </div>
 
@@ -116,41 +119,47 @@ export const FinaleOverlay: React.FC = () => {
             </button>
           </div>
 
-          {/* Step 2 — gated exit link */}
+          {/* Step 2 — gated exit link (manual only: nothing auto-navigates) */}
           <div
-            className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
+            className={`p-3.5 rounded-xl border transition-all ${
               gateOpen
                 ? 'border-amber-400/60 bg-amber-400/10'
                 : 'border-gray-800 bg-cyber-dark/50'
             }`}
           >
-            <div
-              className={`w-10 h-10 rounded-lg border flex items-center justify-center flex-shrink-0 ${
-                gateOpen
-                  ? 'border-amber-400/60 bg-amber-400/15 text-amber-400'
-                  : 'border-gray-700 bg-gray-800 text-gray-500'
-              }`}
-            >
-              {gateOpen ? <ExternalLink className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                Step 2 — Proceed
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-lg border flex items-center justify-center flex-shrink-0 ${
+                  gateOpen
+                    ? 'border-amber-400/60 bg-amber-400/15 text-amber-400'
+                    : 'border-gray-700 bg-gray-800 text-gray-500'
+                }`}
+              >
+                {gateOpen ? <ExternalLink className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
               </div>
-              <div className="text-xs font-bold text-white">
-                {gateOpen ? 'Portal is open' : 'Portal locked — download the fragment first'}
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Step 2 — Proceed (manual)
+                </div>
+                <div className="text-xs font-bold text-white">
+                  {gateOpen
+                    ? 'Portal is open — redirect only when you press the button'
+                    : 'Portal locked — download the fragment first'}
+                </div>
               </div>
             </div>
+
             <button
               onClick={handleEnter}
               disabled={!gateOpen || navigating}
-              className={`px-3 py-2 rounded-lg text-[11px] font-black uppercase tracking-wider border transition-all flex items-center gap-1.5 ${
+              className={`mt-3 w-full py-3.5 px-4 rounded-xl text-sm font-black uppercase tracking-[0.2em] border-2 transition-all flex items-center justify-center gap-2 ${
                 gateOpen
-                  ? 'border-amber-400 text-slate-900 bg-amber-400 hover:bg-amber-300'
+                  ? 'border-amber-300 text-slate-900 bg-gradient-to-r from-amber-300 via-yellow-200 to-orange-300 hover:from-amber-200 hover:to-orange-200 shadow-[0_0_28px_rgba(255,200,60,0.55)] hover:shadow-[0_0_40px_rgba(255,200,60,0.8)] animate-pulse'
                   : 'border-gray-700 text-gray-500 bg-gray-800 cursor-not-allowed'
               }`}
             >
               {navigating ? 'Redirecting…' : 'Enter Next Site'}
+              {!navigating && gateOpen && <Rocket className="w-4 h-4" />}
             </button>
           </div>
         </div>

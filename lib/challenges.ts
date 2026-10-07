@@ -34,6 +34,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       formatHint: 'Format: MANU{...}'
     },
     flagHash: 'ab0add65882dac093c7fd192d395d6cb42edb9b1df8914f8490695573e8a3109',
+    defaultFlag: 'MANU{t1m3st4mp_l5b_h1dd3n_1n_pl41n_s1ght}',
     datasetFragment: {
       fragmentId: 1,
       filename: 'fragment_1.csv',
@@ -142,6 +143,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       formatHint: 'MANU{NAME_HHMM} (UTC)'
     },
     flagHash: 'a2828097ceee05b376adc8af9cbf2ea78e029ab0cbf8da18a51447ea67964ccb',
+    defaultFlag: 'MANU{ROHAN_0335}',
     datasetFragment: {
       fragmentId: 2,
       filename: 'fragment_2.csv',

@@ -461,7 +461,8 @@ export const TerminalHUD: React.FC = () => {
                 </div>
 
                 <div className="flex space-x-2 pt-1">
-                  {challenge.defaultFlag && (
+                  {/* Organizer convenience only — never shipped to players */}
+                  {challenge.defaultFlag && process.env.NODE_ENV !== 'production' && (
                     <button
                       type="button"
                       onClick={() => {

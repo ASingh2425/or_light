@@ -8,15 +8,18 @@ import { ACTIVE_CHALLENGES } from '@/lib/challenges';
 import { FINALE_BEAM_DURATION, FINALE_TOTAL_DURATION } from '@/lib/constants';
 
 const BEAM_COLOR = '#00ff88';
-const GLOW_COLOR = '#00f0ff';
 const CENTER = new THREE.Vector3(0, 8.5, 0);
-const UP = new THREE.Vector3(0, 1, 0);
 
 const PULSES_PER_RAY = 3;
 // Tower roofs top out at y≈9.05 (Building3D), so arcs launch just above them
 const AIR_BEAM_Y = 9.4;
-const GROUND_RAY_Y = 0.28;
-const ARC_APEX = 17;
+const ARC_APEX = 24;
+
+// One vivid hue per ray so the four arcs read as distinct streams
+const RAY_COLORS = ['#00ff88', '#00d4ff', '#ff3df0', '#ffd400'];
+const GLOW_COLORS = RAY_COLORS.map((c) =>
+  new THREE.Color(c).lerp(new THREE.Color('#ffffff'), 0.55).getStyle()
+);
 
 interface AirRay {
   curve: THREE.QuadraticBezierCurve3;
@@ -27,25 +30,11 @@ interface AirRay {
   glowCount: number;
   coreMat: THREE.MeshBasicMaterial;
   glowMat: THREE.MeshBasicMaterial;
-}
-
-interface GroundRay {
-  start: THREE.Vector3;
-  dir: THREE.Vector3;
-  length: number;
-  quaternion: THREE.Quaternion;
+  color: string;
 }
 
 const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
-
-const makeGroundRay = (from: THREE.Vector3, to: THREE.Vector3): GroundRay => {
-  const dir = to.clone().sub(from);
-  const length = dir.length();
-  const unit = dir.clone().normalize();
-  const quaternion = new THREE.Quaternion().setFromUnitVectors(UP, unit);
-  return { start: from.clone(), dir: unit, length, quaternion };
-};
 
 const additiveMat = (color: string) =>
   new THREE.MeshBasicMaterial({
@@ -63,9 +52,6 @@ export const FinaleSequence: React.FC = () => {
 
   const airSparkRefs = useRef<Array<THREE.Mesh | null>>([]);
   const airPulseRefs = useRef<Array<THREE.Mesh | null>>([]);
-  const groundCoreRefs = useRef<Array<THREE.Mesh | null>>([]);
-  const groundGlowRefs = useRef<Array<THREE.Mesh | null>>([]);
-  const groundPulseRefs = useRef<Array<THREE.Mesh | null>>([]);
   const coreSphereRef = useRef<THREE.Mesh>(null);
   const coreWireRef = useRef<THREE.Mesh>(null);
   const flashLightRef = useRef<THREE.PointLight>(null);
@@ -84,32 +70,31 @@ export const FinaleSequence: React.FC = () => {
       return { key: i, a, x: Math.sin(a) * 9.6, z: Math.cos(a) * 9.6 };
     })
   , []);
-  const haloBSegments = useMemo(() =>
-    Array.from({ length: 18 }, (_, i) => {
+  const haloBSegments = useMemo(() => Array.from({ length: 18 }, (_, i) => {
       const a = (i / 18) * Math.PI * 2;
       return { key: i, a, x: Math.sin(a) * 13.2, z: Math.cos(a) * 13.2 };
     })
   , []);
-  const dashGeoA = useMemo(() => new THREE.BoxGeometry(1.05, 0.06, 0.2), []);
-  const dashGeoB = useMemo(() => new THREE.BoxGeometry(2.3, 0.06, 0.26), []);
-  const haloAMat = useMemo(() => additiveMat(BEAM_COLOR), []);
-  const haloBMat = useMemo(() => additiveMat(GLOW_COLOR), []);
-  const plazaRingMat = useMemo(() => additiveMat(BEAM_COLOR), []);
+  const dashGeoA = useMemo(() => new THREE.BoxGeometry(1.4, 0.08, 0.24), []);
+  const dashGeoB = useMemo(() => new THREE.BoxGeometry(3.0, 0.08, 0.32), []);
+  const haloAMat = useMemo(() => additiveMat('#ff3df0'), []);
+  const haloBMat = useMemo(() => additiveMat('#00d4ff'), []);
+  const plazaRingMat = useMemo(() => additiveMat('#ffd400'), []);
   const columnMat = useMemo(() => additiveMat(BEAM_COLOR), []);
   const columnCoreMat = useMemo(() => additiveMat('#eaffff'), []);
-  const baseRingMat = useMemo(() => additiveMat(GLOW_COLOR), []);
-  const portalRingMat = useMemo(() => additiveMat('#ffffff'), []);
-  const crossFlareMat = useMemo(() => additiveMat('#dffff2'), []);
+  const baseRingMat = useMemo(() => additiveMat('#00d4ff'), []);
+  const portalRingMat = useMemo(() => additiveMat('#ff3df0'), []);
+  const crossFlareMat = useMemo(() => additiveMat('#ffffff'), []);
 
-  // ── Air rays: arcs that leave every tower roof and meet at the core ─────
+  // ── ONE arc per live tower: colored stream that meets at the core ───────
   const airRays = useMemo<AirRay[]>(() =>
-    ACTIVE_CHALLENGES.map((challenge) => {
+    ACTIVE_CHALLENGES.map((challenge, i) => {
       const start = new THREE.Vector3(challenge.coordinates[0], AIR_BEAM_Y, challenge.coordinates[2]);
       const mid = start.clone().add(CENTER).multiplyScalar(0.5);
       mid.y = ARC_APEX;
       const curve = new THREE.QuadraticBezierCurve3(start, mid, CENTER.clone());
-      const coreGeo = new THREE.TubeGeometry(curve, 56, 0.3, 8, false);
-      const glowGeo = new THREE.TubeGeometry(curve, 56, 0.95, 10, false);
+      const coreGeo = new THREE.TubeGeometry(curve, 64, 0.55, 10, false);
+      const glowGeo = new THREE.TubeGeometry(curve, 64, 1.9, 12, false);
       const coreCount = coreGeo.index?.count ?? 0;
       const glowCount = glowGeo.index?.count ?? 0;
       coreGeo.setDrawRange(0, 0);
@@ -121,20 +106,11 @@ export const FinaleSequence: React.FC = () => {
         glowGeo,
         coreCount,
         glowCount,
-        coreMat: additiveMat(BEAM_COLOR),
-        glowMat: additiveMat(GLOW_COLOR),
+        coreMat: additiveMat(RAY_COLORS[i % RAY_COLORS.length]),
+        glowMat: additiveMat(GLOW_COLORS[i % GLOW_COLORS.length]),
+        color: RAY_COLORS[i % RAY_COLORS.length],
       };
     })
-  , []);
-
-  // ── Ground rays: floor-level conduits racing the same convergence ───────
-  const groundRays = useMemo<GroundRay[]>(() =>
-    ACTIVE_CHALLENGES.map((challenge) =>
-      makeGroundRay(
-        new THREE.Vector3(challenge.coordinates[0], GROUND_RAY_Y, challenge.coordinates[2]),
-        new THREE.Vector3(0, GROUND_RAY_Y, 0)
-      )
-    )
   , []);
 
   useEffect(() => () => {
@@ -159,27 +135,6 @@ export const FinaleSequence: React.FC = () => {
   const elapsedRef = useRef(0);
   const redirectFiredRef = useRef(false);
 
-  const placeGroundRay = (
-    ray: GroundRay,
-    core: THREE.Mesh | null,
-    glow: THREE.Mesh | null,
-    progress: number
-  ) => {
-    const activeLength = Math.max(0.001, progress * ray.length);
-    const cx = ray.start.x + ray.dir.x * activeLength * 0.5;
-    const cy = ray.start.y + ray.dir.y * activeLength * 0.5;
-    const cz = ray.start.z + ray.dir.z * activeLength * 0.5;
-    if (core) {
-      core.position.set(cx, cy, cz);
-      core.scale.set(1, activeLength, 1);
-    }
-    if (glow) {
-      glow.position.set(cx, cy, cz);
-      glow.scale.set(1, activeLength, 1);
-    }
-    return activeLength;
-  };
-
   useFrame((_, rawDelta) => {
     if (finaleState === 'idle') {
       elapsedRef.current = 0;
@@ -192,24 +147,26 @@ export const FinaleSequence: React.FC = () => {
     const t = (elapsedRef.current += delta);
     // Final 0.8s flourish — blooms everything into the flash
     const lateFlare = clamp01((t - (FINALE_TOTAL_DURATION - 0.8)) / 0.8);
+    // Whole scene cycles hue while the rays are locked in
+    const hue = (t * 0.12) % 1;
 
-    // ── Phase A: arcs grow out of every tower toward the core ─────────────
+    // ── Phase A: one arc per tower grows toward the core ──────────────────
     airRays.forEach((ray, i) => {
       const progress = easeOutCubic(clamp01((t - i * 0.16) / 1.1));
       ray.coreGeo.setDrawRange(0, Math.floor(ray.coreCount * progress));
       ray.glowGeo.setDrawRange(0, Math.floor(ray.glowCount * progress));
 
       ray.coreMat.opacity =
-        (progress >= 1 ? 0.7 + 0.15 * Math.sin(t * 5 + i) : 1.0 * (0.45 + 0.55 * progress)) +
+        (progress >= 1 ? 0.9 + 0.1 * Math.sin(t * 5 + i) : 1.0 * (0.5 + 0.5 * progress)) +
         (progress >= 1 ? lateFlare * 0.3 : 0);
-      ray.glowMat.opacity = 0.2 + 0.08 * Math.sin(t * 3.5 + i * 2) + lateFlare * 0.2;
+      ray.glowMat.opacity = 0.32 + 0.1 * Math.sin(t * 3.5 + i * 2) + lateFlare * 0.25;
 
       const spark = airSparkRefs.current[i];
       if (spark) {
-        const s = 1 + 0.3 * Math.sin(t * 8 + i);
+        const s = 1.25 + 0.4 * Math.sin(t * 8 + i);
         spark.scale.set(s, s, s);
         const mat = spark.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.85 + lateFlare * 0.15;
+        mat.opacity = 0.9 + lateFlare * 0.1;
       }
 
       // Energy packets riding the arc from tower to core
@@ -222,43 +179,9 @@ export const FinaleSequence: React.FC = () => {
           mat.opacity = 0;
           continue;
         }
-        const point = ray.curve.getPoint(phase);
-        mesh.position.copy(point);
-        mat.opacity = 0.35 + 0.55 * Math.abs(Math.sin(t * 9 + k * 1.7));
-        const s = 1 + 0.35 * Math.sin(t * 12 + k);
-        mesh.scale.set(s, s, s);
-      }
-    });
-
-    // ── Ground rays: floor conduits racing the same convergence ───────────
-    groundRays.forEach((ray, i) => {
-      const progress = easeOutCubic(clamp01((t - 0.15 - i * 0.16) / 1.0));
-      const activeLength = placeGroundRay(ray, groundCoreRefs.current[i], groundGlowRefs.current[i], progress);
-
-      const core = groundCoreRefs.current[i];
-      if (core) {
-        const mat = core.material as THREE.MeshBasicMaterial;
-        mat.opacity = (progress >= 1 ? 0.5 + 0.12 * Math.sin(t * 4 + i) : 0.9 * progress) + lateFlare * 0.3;
-      }
-      const glow = groundGlowRefs.current[i];
-      if (glow) {
-        const mat = glow.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.14 + 0.06 * Math.sin(t * 3 + i * 1.5);
-      }
-
-      for (let k = 0; k < PULSES_PER_RAY; k++) {
-        const mesh = groundPulseRefs.current[i * PULSES_PER_RAY + k];
-        if (!mesh) continue;
-        const phase = (t * 0.95 + k / PULSES_PER_RAY + 0.4 + i * 0.11) % 1;
-        const along = phase * activeLength;
-        mesh.position.set(
-          ray.start.x + ray.dir.x * along,
-          ray.start.y + ray.dir.y * along,
-          ray.start.z + ray.dir.z * along
-        );
-        const mat = mesh.material as THREE.MeshBasicMaterial;
-        mat.opacity = progress <= 0.08 ? 0 : 0.35 + 0.55 * Math.abs(Math.sin(t * 9 + k * 1.7));
-        const s = 1 + 0.35 * Math.sin(t * 12 + k);
+        mesh.position.copy(ray.curve.getPoint(phase));
+        mat.opacity = 0.45 + 0.55 * Math.abs(Math.sin(t * 9 + k * 1.7));
+        const s = 1 + 0.4 * Math.sin(t * 12 + k);
         mesh.scale.set(s, s, s);
       }
     });
@@ -266,21 +189,24 @@ export const FinaleSequence: React.FC = () => {
     // ── Phase B: core bloom at the convergence point ─────────────────────
     const coreProgress = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION) / 1.5));
     if (coreSphereRef.current) {
-      const s = Math.max(0.001, coreProgress * 6.5 * (1 + lateFlare * 1.5));
+      const s = Math.max(0.001, coreProgress * 9 * (1 + lateFlare * 1.6));
       coreSphereRef.current.scale.set(s, s, s);
       const mat = coreSphereRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = coreProgress * (0.55 + 0.12 * Math.sin(t * 6)) + lateFlare * 0.3;
+      mat.color.setHSL(hue, 1, 0.75);
+      mat.opacity = coreProgress * (0.65 + 0.12 * Math.sin(t * 6)) + lateFlare * 0.35;
     }
     if (coreWireRef.current) {
-      const s = Math.max(0.001, coreProgress * (8 + Math.sin(t * 2.2) * 0.5));
+      const s = Math.max(0.001, coreProgress * (12 + Math.sin(t * 2.2) * 0.7));
       coreWireRef.current.scale.set(s, s, s);
       coreWireRef.current.rotation.y = t * 0.9;
       coreWireRef.current.rotation.x = t * 0.5;
       const mat = coreWireRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = coreProgress * 0.7;
+      mat.color.setHSL((hue + 0.5) % 1, 1, 0.7);
+      mat.opacity = coreProgress * 0.8;
     }
     if (flashLightRef.current) {
-      flashLightRef.current.intensity = coreProgress * 60;
+      flashLightRef.current.intensity = coreProgress * 90;
+      flashLightRef.current.color.setHSL((hue + 0.15) % 1, 1, 0.72);
     }
 
     // ── Ground shockwave rings ───────────────────────────────────────────
@@ -291,9 +217,10 @@ export const FinaleSequence: React.FC = () => {
         ring.scale.set(0.001, 0.001, 1);
         return;
       }
-      const radius = localT * 38;
+      const radius = localT * 44;
       ring.scale.set(radius, radius, 1);
       const mat = ring.material as THREE.MeshBasicMaterial;
+      mat.color.setHSL((hue + i * 0.25) % 1, 1, 0.6);
       mat.opacity = Math.max(0, 1 - localT / 3.0);
     });
 
@@ -301,27 +228,31 @@ export const FinaleSequence: React.FC = () => {
     const ritualA = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION) / 0.8));
     if (haloAGroupRef.current) {
       haloAGroupRef.current.rotation.y = (t - FINALE_BEAM_DURATION) * 1.5;
-      haloAGroupRef.current.scale.set(Math.max(0.001, ritualA), 1, Math.max(0.001, ritualA));
+      haloAGroupRef.current.scale.set(Math.max(0.001, ritualA * 1.3), 1, Math.max(0.001, ritualA * 1.3));
     }
-    haloAMat.opacity = ritualA * (0.6 + 0.25 * Math.sin(t * 6));
+    haloAMat.color.setHSL((hue + 0.33) % 1, 1, 0.6);
+    haloAMat.opacity = ritualA * (0.7 + 0.25 * Math.sin(t * 6));
 
     const ritualB = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION - 0.4) / 0.8));
     if (haloBGroupRef.current) {
       haloBGroupRef.current.rotation.y = -(t - FINALE_BEAM_DURATION - 0.4) * 1.0;
-      haloBGroupRef.current.scale.set(Math.max(0.001, ritualB), 1, Math.max(0.001, ritualB));
+      haloBGroupRef.current.scale.set(Math.max(0.001, ritualB * 1.25), 1, Math.max(0.001, ritualB * 1.25));
     }
-    haloBMat.opacity = ritualB * (0.5 + 0.2 * Math.sin(t * 5 + 1));
+    haloBMat.color.setHSL((hue + 0.66) % 1, 1, 0.65);
+    haloBMat.opacity = ritualB * (0.6 + 0.2 * Math.sin(t * 5 + 1));
 
     const ritualRing = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION - 0.7) / 0.7));
-    plazaRingMat.opacity = ritualRing * (0.45 + 0.2 * Math.sin(t * 7));
+    plazaRingMat.color.setHSL(hue, 1, 0.6);
+    plazaRingMat.opacity = ritualRing * (0.55 + 0.2 * Math.sin(t * 7));
 
     const baseRingP = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION - 0.5) / 0.6));
     if (baseRingRef.current) {
       baseRingRef.current.rotation.z = t * 0.9;
-      const s = Math.max(0.001, baseRingP * (1 + 0.05 * Math.sin(t * 5)));
+      const s = Math.max(0.001, baseRingP * 1.4 * (1 + 0.05 * Math.sin(t * 5)));
       baseRingRef.current.scale.set(s, s, s);
     }
-    baseRingMat.opacity = baseRingP * (0.6 + 0.25 * Math.sin(t * 8));
+    baseRingMat.color.setHSL((hue + 0.5) % 1, 1, 0.65);
+    baseRingMat.opacity = baseRingP * (0.7 + 0.25 * Math.sin(t * 8));
 
     // Exit portal ring — opens once the rays have locked onto the core
     const portalP = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION - 0.15) / 0.9));
@@ -330,32 +261,36 @@ export const FinaleSequence: React.FC = () => {
       const s = Math.max(0.001, portalP * (1 + 0.035 * Math.sin(t * 4)));
       portalRingRef.current.scale.set(s, s, s);
     }
-    portalRingMat.opacity = portalP * (0.55 + 0.25 * Math.sin(t * 7)) + lateFlare * 0.4;
+    portalRingMat.color.setHSL((hue + 0.75) % 1, 1, 0.7);
+    portalRingMat.opacity = portalP * (0.7 + 0.25 * Math.sin(t * 7)) + lateFlare * 0.4;
 
     // Star flare at the core: blooms on impact, detonates into the flash
     const bloomP = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION) / 0.6));
     if (crossFlareRef.current) {
-      const s = Math.max(0.001, bloomP * 7 + lateFlare * 30);
+      const s = Math.max(0.001, bloomP * 10 + lateFlare * 36);
       crossFlareRef.current.scale.set(s, s, s);
       crossFlareRef.current.rotation.z = t * 0.35;
     }
-    crossFlareMat.opacity = bloomP * 0.45 + lateFlare * 0.55;
+    crossFlareMat.color.setHSL((hue + 0.1) % 1, 1, 0.85);
+    crossFlareMat.opacity = bloomP * 0.55 + lateFlare * 0.6;
 
     // Rising light column — swells right before the flash
     const columnP = easeOutCubic(clamp01((t - FINALE_BEAM_DURATION - 0.5) / 1.2));
     if (columnGroupRef.current) {
       columnGroupRef.current.scale.set(
-        1 + lateFlare * 2.6,
+        1 + lateFlare * 3.2,
         Math.max(0.001, columnP),
-        1 + lateFlare * 2.6
+        1 + lateFlare * 3.2
       );
     }
-    columnMat.opacity = columnP * (0.3 + 0.15 * Math.sin(t * 9)) + lateFlare * 0.55;
-    columnCoreMat.opacity = columnP * 0.5 + lateFlare * 0.45;
+    columnMat.color.setHSL(hue, 1, 0.6);
+    columnCoreMat.color.setHSL((hue + 0.5) % 1, 1, 0.78);
+    columnMat.opacity = columnP * (0.4 + 0.15 * Math.sin(t * 9)) + lateFlare * 0.6;
+    columnCoreMat.opacity = columnP * 0.55 + lateFlare * 0.5;
 
     // ── Late flourish: everything blooms into the flash ───────────────────
     if (flashLightRef.current) {
-      flashLightRef.current.intensity += lateFlare * 70;
+      flashLightRef.current.intensity += lateFlare * 90;
     }
 
     // ── Phase C: hand off to the flash + exit panel ──────────────────────
@@ -369,7 +304,7 @@ export const FinaleSequence: React.FC = () => {
 
   return (
     <group>
-      {/* ── Air arcs: every live tower pours energy into the core ── */}
+      {/* ── ONE colored arc per live tower converging on the core ── */}
       {airRays.map((ray, i) => (
         <group key={`air-${i}`}>
           <mesh geometry={ray.glowGeo} material={ray.glowMat} />
@@ -377,11 +312,11 @@ export const FinaleSequence: React.FC = () => {
           {/* Emission spark hovering over the tower roof */}
           <mesh
             ref={(el) => { airSparkRefs.current[i] = el; }}
-            position={[ray.start.x, ray.start.y + 0.9, ray.start.z]}
+            position={[ray.start.x, ray.start.y + 1.1, ray.start.z]}
           >
-            <sphereGeometry args={[1.5, 14, 14]} />
+            <sphereGeometry args={[2.4, 16, 16]} />
             <meshBasicMaterial
-              color={GLOW_COLOR}
+              color={ray.color}
               transparent
               opacity={0}
               blending={THREE.AdditiveBlending}
@@ -394,51 +329,7 @@ export const FinaleSequence: React.FC = () => {
               ref={(el) => { airPulseRefs.current[i * PULSES_PER_RAY + k] = el; }}
               position={[ray.start.x, ray.start.y, ray.start.z]}
             >
-              <sphereGeometry args={[0.8, 10, 10]} />
-              <meshBasicMaterial
-                color="#ffffff"
-                transparent
-                opacity={0}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-              />
-            </mesh>
-          ))}
-        </group>
-      ))}
-
-      {/* ── Ground rays: floor-level conduits racing the same convergence ── */}
-      {groundRays.map((ray, i) => (
-        <group key={`ground-${i}`}>
-          <mesh ref={(el) => { groundCoreRefs.current[i] = el; }} quaternion={ray.quaternion} scale={[1, 0.001, 1]}>
-            <cylinderGeometry args={[0.5, 0.5, 1, 8]} />
-            <meshBasicMaterial
-              color={GLOW_COLOR}
-              transparent
-              opacity={0}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          <mesh ref={(el) => { groundGlowRefs.current[i] = el; }} quaternion={ray.quaternion} scale={[1, 0.001, 1]}>
-            <cylinderGeometry args={[1.6, 1.6, 1, 10]} />
-            <meshBasicMaterial
-              color={BEAM_COLOR}
-              transparent
-              opacity={0}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          {Array.from({ length: PULSES_PER_RAY }).map((_, k) => (
-            <mesh
-              key={`ground-pulse-${i}-${k}`}
-              ref={(el) => { groundPulseRefs.current[i * PULSES_PER_RAY + k] = el; }}
-              position={[ray.start.x, ray.start.y, ray.start.z]}
-            >
-              <sphereGeometry args={[1.0, 10, 10]} />
+              <sphereGeometry args={[1.1, 10, 10]} />
               <meshBasicMaterial
                 color="#ffffff"
                 transparent
@@ -453,7 +344,7 @@ export const FinaleSequence: React.FC = () => {
 
       {/* ── Convergence core: solid + wireframe shells ── */}
       <mesh ref={coreSphereRef} position={CENTER} scale={0.001}>
-        <sphereGeometry args={[1, 24, 24]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <meshBasicMaterial
           color="#ffffff"
           transparent
@@ -477,22 +368,22 @@ export const FinaleSequence: React.FC = () => {
       {/* ── Star flare that detonates into the exit flash ── */}
       <group ref={crossFlareRef} position={CENTER} scale={0.001}>
         <mesh material={crossFlareMat} rotation={[0, 0, Math.PI / 2]}>
-          <planeGeometry args={[1, 0.14]} />
+          <planeGeometry args={[1, 0.16]} />
         </mesh>
         <mesh material={crossFlareMat} rotation={[0, 0, 0]}>
-          <planeGeometry args={[0.14, 1]} />
+          <planeGeometry args={[0.16, 1]} />
         </mesh>
         <mesh material={crossFlareMat} rotation={[0, 0, Math.PI / 4]}>
-          <planeGeometry args={[0.7, 0.08]} />
+          <planeGeometry args={[0.75, 0.1]} />
         </mesh>
         <mesh material={crossFlareMat} rotation={[0, 0, -Math.PI / 4]}>
-          <planeGeometry args={[0.08, 0.7]} />
+          <planeGeometry args={[0.1, 0.75]} />
         </mesh>
       </group>
 
       {/* ── Exit portal ring floating above the core ── */}
-      <mesh ref={portalRingRef} position={[0, 14.5, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={0.001} material={portalRingMat}>
-        <torusGeometry args={[6.2, 0.32, 10, 64]} />
+      <mesh ref={portalRingRef} position={[0, 15.5, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={0.001} material={portalRingMat}>
+        <torusGeometry args={[8, 0.5, 12, 72]} />
       </mesh>
 
       {/* ── Ground shockwave rings ── */}
@@ -504,9 +395,9 @@ export const FinaleSequence: React.FC = () => {
           rotation={[-Math.PI / 2, 0, 0]}
           scale={0.001}
         >
-          <ringGeometry args={[0.96, 1, 64]} />
+          <ringGeometry args={[0.94, 1, 64]} />
           <meshBasicMaterial
-            color={i === 1 ? GLOW_COLOR : BEAM_COLOR}
+            color={BEAM_COLOR}
             transparent
             opacity={0}
             blending={THREE.AdditiveBlending}
@@ -542,26 +433,26 @@ export const FinaleSequence: React.FC = () => {
 
       {/* Full glowing circle that seals the ritual */}
       <mesh position={[0, 0.15, 0]} rotation={[-Math.PI / 2, 0, 0]} material={plazaRingMat}>
-        <ringGeometry args={[16.5, 16.9, 96]} />
+        <ringGeometry args={[19, 19.6, 96]} />
       </mesh>
 
       {/* Ritual seal on the pedestal */}
       <mesh ref={baseRingRef} position={[0, 0.95, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={0.001} material={baseRingMat}>
-        <ringGeometry args={[2.3, 2.6, 64]} />
+        <ringGeometry args={[2.3, 2.7, 64]} />
       </mesh>
 
       {/* ── Rising light column (graceful hand-off into the flash) ── */}
       <group ref={columnGroupRef} position={[0, 0.6, 0]} scale={[1, 0.001, 1]}>
         <mesh material={columnMat} position={[0, 45, 0]}>
-          <cylinderGeometry args={[1.8, 3.4, 90, 24, 1, true]} />
+          <cylinderGeometry args={[2.4, 4.4, 90, 24, 1, true]} />
         </mesh>
         <mesh material={columnCoreMat} position={[0, 45, 0]}>
-          <cylinderGeometry args={[0.55, 1.1, 90, 12, 1, true]} />
+          <cylinderGeometry args={[0.7, 1.4, 90, 12, 1, true]} />
         </mesh>
       </group>
 
       {/* ── Explosion point light ── */}
-      <pointLight ref={flashLightRef} position={CENTER} color="#ccffcc" intensity={0} distance={160} />
+      <pointLight ref={flashLightRef} position={CENTER} color="#ccffcc" intensity={0} distance={200} />
     </group>
   );
 };
