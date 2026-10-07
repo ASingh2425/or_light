@@ -1,0 +1,2 @@
+{ "extends": "/home/claude/build/verify/tsconfig.json",
+  "compilerOptions": { "jsx": "react-jsx", "baseUrl": "/home/claude/build/verify", "paths": { "@/*": ["./*"] } } }
