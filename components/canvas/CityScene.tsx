@@ -25,7 +25,7 @@ export const CityScene: React.FC = () => {
         <Suspense fallback={null}>
           <CityEnvironment />
 
-          {/* Render All 5 Forensic Sector Buildings */}
+          {/* Forensic sector buildings (SEC-05 renders as a dead ruin) */}
           {FORENSIC_CHALLENGES.map((challenge) => (
             <Building3D
               key={challenge.id}

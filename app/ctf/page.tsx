@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ShieldAlert, Terminal, Lock, ChevronRight, FileText, Database, CheckCircle2 } from 'lucide-react';
-import { FORENSIC_CHALLENGES } from '@/lib/challenges';
+import { ACTIVE_CHALLENGES } from '@/lib/challenges';
 
 function CTFContent() {
   const searchParams = useSearchParams();
@@ -12,7 +12,7 @@ function CTFContent() {
   const [flag, setFlag] = useState('');
   const [status, setStatus] = useState<{type: 'idle' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
 
-  const currentChallenge = FORENSIC_CHALLENGES.find(c => c.id === activeChallenge) || FORENSIC_CHALLENGES[0];
+  const currentChallenge = ACTIVE_CHALLENGES.find(c => c.id === activeChallenge) || ACTIVE_CHALLENGES[0];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ function CTFContent() {
           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-800 pb-2">
             Challenges
           </div>
-          {FORENSIC_CHALLENGES.map((c) => (
+          {ACTIVE_CHALLENGES.map((c) => (
             <button
               key={c.id}
               onClick={() => { setActiveChallenge(c.id); setStatus({type: 'idle', msg: ''}); setFlag(''); }}

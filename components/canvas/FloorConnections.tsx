@@ -13,8 +13,8 @@ import { FORENSIC_CHALLENGES } from '@/lib/challenges';
  * There are NO static roads on the arena floor: a conduit only exists for a
  * building whose flag has been accepted. On clearance it draws itself in from
  * the building edge toward the central pedestal, then keeps a steady flow of
- * data pulses travelling inward. During the finale the pulses surge so all
- * five lanes visibly drain into the plaza right before the circle ritual.
+ * data pulses travelling inward. During the finale the pulses surge so every
+ * cleared lane visibly drains into the plaza right before the circle ritual.
  */
 
 const LANE_Y = 0.12;

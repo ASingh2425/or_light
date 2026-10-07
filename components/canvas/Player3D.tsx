@@ -7,6 +7,7 @@ import { useGameStore } from '@/lib/store';
 import { FORENSIC_CHALLENGES } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
 import { pointerState } from '@/lib/inputState';
+import { FINALE_CAM_RADIUS, FINALE_CAM_HEIGHT, FINALE_CAM_FOV } from '@/lib/constants';
 import { sound } from '@/components/audio/SoundEffects';
 
 // Exponential damping helper (frame-rate independent smoothing)
@@ -299,17 +300,18 @@ export const Player3D: React.FC = () => {
         orbit.initialized = true;
         orbit.angle = Math.atan2(camBase.x, camBase.z);
       }
-      orbit.angle += delta * 0.13;
-      const orbitRadius = 46;
+      orbit.angle += delta * 0.09;
+      // Wide crane shot: high and far so every ray + the core stay framed
+      const orbitRadius = FINALE_CAM_RADIUS;
       const targetX = Math.sin(orbit.angle) * orbitRadius;
-      const targetY = 17 + Math.sin(orbit.angle * 0.6) * 2.5;
+      const targetY = FINALE_CAM_HEIGHT + Math.sin(orbit.angle * 0.6) * 3;
       const targetZ = Math.cos(orbit.angle) * orbitRadius;
-      const glide = smoothFactor(2.0, delta);
+      const glide = smoothFactor(2.8, delta);
       camBase.x += (targetX - camBase.x) * glide;
       camBase.y += (targetY - camBase.y) * glide;
       camBase.z += (targetZ - camBase.z) * glide;
       lookTargetRef.current.x += (0 - lookTargetRef.current.x) * glide;
-      lookTargetRef.current.y += (9 - lookTargetRef.current.y) * glide;
+      lookTargetRef.current.y += (8.5 - lookTargetRef.current.y) * glide;
       lookTargetRef.current.z += (0 - lookTargetRef.current.z) * glide;
       camera.position.copy(camBase);
       camera.lookAt(lookTargetRef.current);
@@ -360,7 +362,7 @@ export const Player3D: React.FC = () => {
     const persp = camera as THREE.PerspectiveCamera;
     const targetFov =
       finaleState !== 'idle'
-        ? 50
+        ? FINALE_CAM_FOV
         : isTerminalOpen
           ? 40
           : isNitroActive && speed > 4
@@ -379,8 +381,8 @@ export const Player3D: React.FC = () => {
 
     let nearbyBuilding: string | null = null;
     for (const bldg of FORENSIC_CHALLENGES) {
-      // SEC-05 is a dead sector: no terminal there, so it never triggers.
-      if (bldg.id === 'building-5') continue;
+      // Dead sectors have no terminal, so they never trigger.
+      if (bldg.dead) continue;
       const dx = pos.x - bldg.coordinates[0];
       const dz = pos.z - bldg.coordinates[2];
       const dist = Math.sqrt(dx * dx + dz * dz);

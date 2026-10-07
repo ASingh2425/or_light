@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Navigation, Maximize2, Minimize2, Radio, Zap } from 'lucide-react';
 import { useGameStore } from '@/lib/store';
-import { FORENSIC_CHALLENGES } from '@/lib/challenges';
+import { ACTIVE_CHALLENGES, FORENSIC_CHALLENGES } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
 import { sound } from '@/components/audio/SoundEffects';
 
@@ -146,7 +146,7 @@ export const MiniMap: React.FC = () => {
           )}
 
           {/* Building Markers */}
-          {FORENSIC_CHALLENGES.map((bldg) => {
+          {ACTIVE_CHALLENGES.map((bldg) => {
             const bx = mapCoord(bldg.coordinates[0]);
             const by = mapCoord(bldg.coordinates[2]);
             const isDone = clearedBuildingIds.includes(bldg.id);

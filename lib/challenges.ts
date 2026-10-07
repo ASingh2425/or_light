@@ -305,6 +305,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
     buildingNumber: 5,
     name: 'Research Evaluation Quarantine Wing',
     sectorTag: 'SEC-05 / SURVIVAL-GATE',
+    dead: true,
     coordinates: [0, 0, 52],
     color: '#ff3300',
     themeColor: 'from-amber-600/20 to-orange-700/10',
@@ -347,3 +348,15 @@ RESULT: Unlocks Fragment 5 and activates Full Dataset Download.`,
     }
   }
 ];
+
+/** Sectors that actually host a live CTF terminal (dead sectors excluded). */
+export const ACTIVE_CHALLENGES: BuildingChallenge[] = FORENSIC_CHALLENGES.filter((c) => !c.dead);
+
+/** Live CTF sectors — drives the progress bar, dashboard and finale. */
+export const TOTAL_ACTIVE_SECTORS = ACTIVE_CHALLENGES.length;
+
+/** Ids of dead / decommissioned sectors that never accept a flag. */
+export const DEAD_SECTOR_IDS: ReadonlySet<string> = new Set(
+  FORENSIC_CHALLENGES.filter((c) => c.dead).map((c) => c.id)
+);
+

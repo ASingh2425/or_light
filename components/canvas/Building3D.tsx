@@ -37,7 +37,7 @@ export const Building3D: React.FC<Building3DProps> = ({
 
   // SEC-05: dead sector — structure kept exactly as built, all of its lights
   // switched off and its terminal removed (it renders as a burnt-out shell).
-  const isDead = challenge.id === 'building-5';
+  const isDead = Boolean(challenge.dead);
   const darkColor = useMemo(() => new THREE.Color('#1b1f27'), []);
 
   const mainColor = useMemo(() => {
