@@ -38,7 +38,7 @@ const CTF_PORTAL_LINKS = [
   {
     id: 'building-2',
     label: 'SEC-02',
-    name: "Archivist's Account",
+    name: 'Who Edited This?',
     icon: Cpu,
   },
   {

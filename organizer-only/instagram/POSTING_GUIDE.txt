@@ -1,0 +1,59 @@
+ACCOUNT SETUP
+=============
+Handle  : manu_archivist_0
+Type    : public (NOT private), personal/creator is fine
+Name    : The Archivist
+Bio     : Keeper of the Sanctuary ledger. Survivor cards, batch 2. Rule pinned.
+Profile picture: profile_picture.png
+Follow nobody. No highlights, no stories, no links.
+
+POSTS (publish in this order, newest ends up on top; pin post 10 last)
+
+--- post_01_card.png
+Caption: Batch intake, morning shift. Fast on her feet.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: consistent]
+
+--- post_02_card.png
+Caption: Wing B triage lead. Steady hands.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: consistent (will be reposted later)]
+
+--- post_03_card.png
+Caption: Shelter crew. Right on the line, and the ledger rule says LIVES at 0.50.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: NEAR-MISS: boundary 0.50 = LIVES (correct)]
+
+--- post_04_card.png
+Caption: Ration analyst. Logged as lost after the east gate closed.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: consistent]
+
+--- post_05_card.png
+Caption: Outer-wall scout. Last logged at the north gate.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: CONTRADICTION: 0.28 < 0.50 but labelled LIVES]
+
+--- post_06_card.png
+Caption: Kitchen lead. One hundredth short of the line.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: NEAR-MISS: boundary 0.49 = LOST (correct)]
+
+--- post_07_card.png
+Caption: Water systems. Built half the filters in Wing D.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: consistent]
+
+--- post_08_card.png
+Caption: Reposted: card reformatted, nothing changed. Same person, same score.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: NEAR-MISS: repost of card 2, identical data]
+
+--- post_09_card.png
+Caption: Supply porter. Did not return from the last run.
+Hashtags: #sanctuary #ledger
+[organiser note, do NOT post: consistent]
+
+--- post_10_rule_PIN_THIS.png
+Caption: The ledger rule. Pinned for everyone who keeps the books.
+Then: open the post -> ... -> Pin to your profile.
