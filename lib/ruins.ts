@@ -6,7 +6,7 @@
  * the sector approach lines so they never block a path to a building.
  */
 export interface RuinSite {
-  id: 'ruin-tower' | 'ruin-shell' | 'ruin-silo';
+  id: 'ruin-tower' | 'ruin-shell' | 'ruin-silo' | 'ruin-quarantine';
   x: number;
   z: number;
   /** Collision radius used by the car's push-out pass. */
@@ -17,6 +17,8 @@ export const RUIN_SITES: readonly RuinSite[] = [
   { id: 'ruin-tower', x: -52, z: 2, radius: 5.2 },
   { id: 'ruin-shell', x: 52, z: 4, radius: 5.6 },
   { id: 'ruin-silo', x: 0, z: -50, radius: 5.4 },
+  // Former building-5 (SEC-05): blown apart, no terminal, no flag.
+  { id: 'ruin-quarantine', x: 0, z: 52, radius: 5.8 },
 ];
 
 /** The sector whose building is overrun. Its CTF still works normally. */

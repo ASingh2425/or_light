@@ -381,8 +381,6 @@ export const Player3D: React.FC = () => {
 
     let nearbyBuilding: string | null = null;
     for (const bldg of FORENSIC_CHALLENGES) {
-      // Dead sectors have no terminal, so they never trigger.
-      if (bldg.dead) continue;
       const dx = pos.x - bldg.coordinates[0];
       const dz = pos.z - bldg.coordinates[2];
       const dist = Math.sqrt(dx * dx + dz * dz);

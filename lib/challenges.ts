@@ -338,64 +338,12 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       rowCount: 90,
       description: 'Historical records for Sanctuary batch 4. Contains social support, quarantine days, and resilience metrics.'
     }
-  },
-  {
-    id: 'building-5',
-    buildingNumber: 5,
-    name: 'Research Evaluation Quarantine Wing',
-    sectorTag: 'SEC-05 / SURVIVAL-GATE',
-    dead: true,
-    coordinates: [0, 0, 52],
-    color: '#ff3300',
-    themeColor: 'from-amber-600/20 to-orange-700/10',
-    evidenceImage: '/images/forensic-evidence-5.svg',
-    briefing: {
-      title: 'Sealed Historical Survivor Cohort',
-      subtitle: 'Unlocking the Continuous Survival Probability Model Target',
-      storyContext: 'This final vault facility holds the sealed medical records and ground-truth outcomes for all 450 historical survivors. The target variable is continuous survival probability (0.0 to 1.0) rather than a simple binary label—empowering the upcoming ML competition model.',
-      objective: 'Enter the final research clearance key to unlock Fragment 5 and assemble the full 450-record dataset.',
-      loreHint: 'The clearance key confirms the continuous regression target for the Random Forest model.',
-    },
-    evidenceList: [
-      {
-        id: 'ev-5-1',
-        title: 'Research Model Specification',
-        type: 'log',
-        content: `TARGET SPECIFICATION:
-Variable: Survival_Probability (Float 0.000 to 1.000)
-Training Cohort: 450 Historical Records
-Model Architecture: Random Forest Regressor / Gradient Booster
-Clearance Token: MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}
-RESULT: Unlocks Fragment 5 and activates Full Dataset Download.`,
-        notes: 'Final sector unlocking the entire historical archive.'
-      }
-    ],
-    questionPrompt: {
-      text: 'Submit the Research Clearance Token to unlock Dataset Fragment 5 (Records HIST_361 to HIST_450) and complete the Orange Zone!',
-      inputPlaceholder: 'MANU{...}',
-      formatHint: 'Default flag: MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}'
-    },
-    defaultFlag: 'MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}',
-    flagHash: 'dc0d35afdef497ade2b23d00c05f27a9db02fb34119fde00636b447ba3dcae57',
-    datasetFragment: {
-      fragmentId: 5,
-      filename: 'fragment_5.csv',
-      downloadUrl: '/data/fragments/fragment_5.csv',
-      recordRange: 'HIST_361 — HIST_450',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 5. Completes the 450 dataset with ground truth Survival_Probability.'
-    }
   }
 ];
 
-/** Sectors that actually host a live CTF terminal (dead sectors excluded). */
-export const ACTIVE_CHALLENGES: BuildingChallenge[] = FORENSIC_CHALLENGES.filter((c) => !c.dead);
-
 /** Live CTF sectors — drives the progress bar, dashboard and finale. */
-export const TOTAL_ACTIVE_SECTORS = ACTIVE_CHALLENGES.length;
+export const ACTIVE_CHALLENGES: BuildingChallenge[] = FORENSIC_CHALLENGES;
 
-/** Ids of dead / decommissioned sectors that never accept a flag. */
-export const DEAD_SECTOR_IDS: ReadonlySet<string> = new Set(
-  FORENSIC_CHALLENGES.filter((c) => c.dead).map((c) => c.id)
-);
+/** Live CTF sectors count. */
+export const TOTAL_ACTIVE_SECTORS = ACTIVE_CHALLENGES.length;
 

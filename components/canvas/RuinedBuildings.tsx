@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { RUIN_SITES } from '@/lib/ruins';
 
 /**
- * Three clearly different wrecks for the post-war theme. They are decor only
+ * Four clearly different wrecks for the post-war theme. They are decor only
  * (the car is pushed out of them via lib/ruins.ts) and use plain flat-shaded
  * materials with no shadows and no per-frame work, so they cost almost nothing
  * on an integrated GPU.
@@ -176,10 +176,93 @@ const CrackedSilo: React.FC = () => {
   );
 };
 
+// ───────────────────────── 4. Quarantine wing: sector monolith blown apart ─────────────────────────
+const QuarantineWreck: React.FC = () => {
+  const char = useMemo(() => mat(0x2f2b28), []);
+  const concrete = useMemo(() => mat(0x5f5c56), []);
+  const steel = useMemo(() => mat(0x6b6f73), []);
+  const glass = useMemo(() => mat(0x10161b, { emissive: 0x06101a, emissiveIntensity: 0.25 }), []);
+  const hazard = useMemo(() => mat(0x8a6a12, { side: THREE.DoubleSide }), []);
+  return (
+    <group>
+      {/* scorched hexagonal sector base */}
+      <mesh material={concrete} position={[0, 0.25, 0]}>
+        <cylinderGeometry args={[5.6, 6.4, 0.5, 6]} />
+      </mesh>
+      <mesh material={char} position={[0, 0.55, 0]} rotation={[0, 0.18, 0]}>
+        <cylinderGeometry args={[4.4, 5.0, 0.3, 6]} />
+      </mesh>
+
+      {/* the monolith core, snapped at the waist and pitched over */}
+      <group position={[1.2, 1.4, 0.6]} rotation={[0.32, -0.5, 0.62]}>
+        <mesh material={char} position={[0, 2.8, 0]}>
+          <cylinderGeometry args={[3.0, 3.5, 5.4, 6]} />
+        </mesh>
+        {/* jagged fracture teeth where it snapped */}
+        {[0, 1, 2, 3, 4, 5].map((i) => {
+          const a = (i / 6) * Math.PI * 2;
+          return (
+            <mesh
+              key={i}
+              material={concrete}
+              position={[Math.cos(a) * 2.3, 5.6 + rand(i + 4) * 0.7, Math.sin(a) * 2.3]}
+              rotation={[rand(i) * 0.6, -a, rand(i + 2) * 0.4]}
+            >
+              <boxGeometry args={[1.1, 1.4 + rand(i + 6) * 1.2, 1.3]} />
+            </mesh>
+          );
+        })}
+        {/* dead data strips, most of the glass gone */}
+        {[1.4, 3.0, 4.6].map((y) => (
+          <mesh key={y} material={glass} position={[0, y, 2.95]}>
+            <boxGeometry args={[2.6, 0.7, 0.12]} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* severed stump of the core still bolted to the platform */}
+      <mesh material={concrete} position={[-1.6, 1.15, -1.0]} rotation={[0, 0.4, 0]}>
+        <cylinderGeometry args={[2.4, 3.0, 1.5, 6]} />
+      </mesh>
+
+      {/* hazard ring, half buried and torn open */}
+      <mesh material={hazard} position={[0, 0.62, 0]} rotation={[-Math.PI / 2, 0, 0.3]}>
+        <ringGeometry args={[5.9, 6.3, 32, 1, 0, Math.PI * 1.15]} />
+      </mesh>
+
+      {/* toppled beacon mast */}
+      <mesh material={steel} position={[-2.8, 0.75, 3.4]} rotation={[0.2, 0.7, Math.PI / 2 - 0.25]}>
+        <cylinderGeometry args={[0.16, 0.22, 5.5, 6]} />
+      </mesh>
+      <mesh position={[-5.1, 1.0, 4.7]} rotation={[0.4, 0.2, 0.5]}>
+        <sphereGeometry args={[0.4, 8, 8]} />
+        <meshStandardMaterial color={0x3f3a33} roughness={1} flatShading />
+      </mesh>
+
+      {/* snapped energy pylons */}
+      {[0, 1].map((i) => (
+        <mesh
+          key={i}
+          material={steel}
+          position={[i === 0 ? 4.4 : -3.7, 1.0, i === 0 ? -3.2 : 4.1]}
+          rotation={[0.15 * (i + 1), 0.8 * i, 0.5]}
+        >
+          <cylinderGeometry args={[0.2, 0.28, 3.2, 6]} />
+        </mesh>
+      ))}
+
+      <Rebar pos={[1.9, 6.6, 1.2]} tilt={[0.3, 0, 0.4]} len={3.0} />
+      <Rebar pos={[0.4, 7.0, -1.4]} tilt={[-0.25, 0, -0.3]} len={3.4} />
+      <Rubble n={30} spread={6.6} seed={63} color={0x55524b} />
+    </group>
+  );
+};
+
 const RUIN_VIEWS: Record<string, { node: React.ReactNode; rotY: number }> = {
   'ruin-tower': { node: <CollapsedTower />, rotY: 0.6 },
   'ruin-shell': { node: <GuttedShell />, rotY: -0.5 },
   'ruin-silo': { node: <CrackedSilo />, rotY: 2.3 },
+  'ruin-quarantine': { node: <QuarantineWreck />, rotY: -1.1 },
 };
 
 export const RuinedBuildings: React.FC = () => (

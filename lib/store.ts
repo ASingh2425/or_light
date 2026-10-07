@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { GameState, HudPanelKey, ThemePreset } from './types';
-import { ACTIVE_CHALLENGES, DEAD_SECTOR_IDS, TOTAL_ACTIVE_SECTORS } from './challenges';
+import { ACTIVE_CHALLENGES, TOTAL_ACTIVE_SECTORS } from './challenges';
 import { FINALE_AUTO_START_DELAY_MS } from './constants';
 import { sound } from '@/components/audio/SoundEffects';
 
@@ -37,8 +37,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   setSelectedEvidenceImage: (img) => set({ selectedEvidenceImage: img }),
   
   setActiveBuilding: (id) => {
-    // Dead sectors (SEC-05) never open a terminal.
-    if (id && DEAD_SECTOR_IDS.has(id)) return;
     set({ 
       activeBuildingId: id,
       isTerminalOpen: id !== null,

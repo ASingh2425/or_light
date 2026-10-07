@@ -35,8 +35,6 @@ export interface BuildingChallenge {
   defaultFlag?: string;
   flagHash: string;
   evidenceImage?: string;
-  /** Dead / decommissioned sector: no terminal, no CTF, excluded from progress. */
-  dead?: boolean;
   datasetFragment: {
     fragmentId: number;
     filename: string;

@@ -6,7 +6,9 @@ export const FINAL_REDIRECT_URL = 'https://example.com';
 // Finale timeline (seconds) — must match FinaleSequence.tsx
 export const FINALE_BEAM_DURATION = 2.2; // rays finish growing
 export const FINALE_TOTAL_DURATION = 4.4; // sequence done -> flash + exit panel
-export const FINALE_REDIRECT_DELAY_MS = 600; // button press -> navigation (manual only)
+// Button press -> navigation. The portal warp animation runs for the whole
+// window (never an instant jump); must match .finale-warp in globals.css.
+export const FINALE_REDIRECT_DELAY_MS = 2400;
 
 // Delay between the 4th sector unlocking and the automatic finale takeover.
 export const FINALE_AUTO_START_DELAY_MS = 1700;

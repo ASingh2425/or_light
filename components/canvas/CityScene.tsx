@@ -25,7 +25,7 @@ export const CityScene: React.FC = () => {
         <Suspense fallback={null}>
           <CityEnvironment />
 
-          {/* Forensic sector buildings (SEC-05 renders as a dead ruin) */}
+          {/* Forensic sector buildings */}
           {FORENSIC_CHALLENGES.map((challenge) => (
             <Building3D
               key={challenge.id}
@@ -38,7 +38,7 @@ export const CityScene: React.FC = () => {
           {/* Building → plaza energy conduits (appear per cleared flag) */}
           <FloorConnections />
 
-          {/* Three wrecked buildings (decor only, no sectors) */}
+          {/* Four wrecks (decor only, no sectors) */}
           <RuinedBuildings />
 
           {/* Controllable Player Avatar */}

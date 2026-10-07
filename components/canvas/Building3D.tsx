@@ -35,17 +35,11 @@ export const Building3D: React.FC<Building3DProps> = ({
 
   const [x, y, z] = challenge.coordinates;
 
-  // SEC-05: dead sector — structure kept exactly as built, all of its lights
-  // switched off and its terminal removed (it renders as a burnt-out shell).
-  const isDead = Boolean(challenge.dead);
-  const darkColor = useMemo(() => new THREE.Color('#1b1f27'), []);
-
   const mainColor = useMemo(() => {
-    if (isDead) return darkColor;
     if (isCleared) return new THREE.Color(theme.buildingClearedColor);
     if (isActive) return new THREE.Color(theme.roadTrimColor);
     return new THREE.Color(theme.buildingGlassColor);
-  }, [isCleared, isActive, theme, isDead, darkColor]);
+  }, [isCleared, isActive, theme]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
@@ -69,8 +63,6 @@ export const Building3D: React.FC<Building3DProps> = ({
   });
 
   const handleClick = () => {
-    // Dead sector: no terminal, no sound.
-    if (isDead) return;
     // Ignore clicks that were actually camera-orbit drags
     if (pointerState.dragDistance > 8) return;
     // Locked sectors only open from physical proximity (same radius the
@@ -108,7 +100,7 @@ export const Building3D: React.FC<Building3DProps> = ({
         <meshStandardMaterial
           color={theme.roadTrimColor}
           emissive={theme.roadTrimColor}
-          emissiveIntensity={isDead ? 0 : 0.25}
+          emissiveIntensity={0.25}
           roughness={0.3}
           metalness={0.6}
         />
@@ -124,7 +116,7 @@ export const Building3D: React.FC<Building3DProps> = ({
         <meshBasicMaterial
           color={mainColor}
           transparent
-          opacity={isDead ? 0.12 : isCleared ? 0.75 : 0.9}
+          opacity={isCleared ? 0.75 : 0.9}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -162,7 +154,7 @@ export const Building3D: React.FC<Building3DProps> = ({
           transparent
           opacity={0.18}
           emissive={mainColor}
-          emissiveIntensity={isDead ? 0 : 0.3}
+          emissiveIntensity={0.3}
           wireframe={!isCleared}
         />
       </mesh>
@@ -174,7 +166,7 @@ export const Building3D: React.FC<Building3DProps> = ({
           color={mainColor}
           wireframe={!isCleared}
           emissive={mainColor}
-          emissiveIntensity={isDead ? 0 : isCleared ? 1.2 : 0.8}
+          emissiveIntensity={isCleared ? 1.2 : 0.8}
           transparent
           opacity={0.88}
         />
@@ -184,7 +176,7 @@ export const Building3D: React.FC<Building3DProps> = ({
       <group ref={dataRingsRef} position={[0, 5.6, 0]}>
         <mesh rotation={[Math.PI / 3, 0, 0]}>
           <torusGeometry args={[2.8, 0.06, 8, 36]} />
-          <meshBasicMaterial color={isDead ? darkColor : theme.buildingBeaconColor} />
+          <meshBasicMaterial color={theme.buildingBeaconColor} />
         </mesh>
         <mesh rotation={[-Math.PI / 3, 0, Math.PI / 4]}>
           <torusGeometry args={[3.4, 0.04, 8, 36]} />
@@ -200,9 +192,9 @@ export const Building3D: React.FC<Building3DProps> = ({
             <mesh key={`shard-${i}`} position={[sx, Math.sin(i * 1.5) * 0.8, sz]} rotation={[i, i * 0.7, 0]}>
               <boxGeometry args={[0.55, 0.55, 0.55]} />
               <meshStandardMaterial
-                color={isDead ? darkColor : theme.buildingBeaconColor}
-                emissive={isDead ? darkColor : theme.buildingBeaconColor}
-                emissiveIntensity={isDead ? 0 : 0.9}
+                color={theme.buildingBeaconColor}
+                emissive={theme.buildingBeaconColor}
+                emissiveIntensity={0.9}
               />
             </mesh>
           );
@@ -233,11 +225,11 @@ export const Building3D: React.FC<Building3DProps> = ({
       {/* ── Forensic Crime Scene Yellow Caution Ring ── */}
       <mesh position={[0, 0.09, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[6.8, 7.1, 32]} />
-        <meshBasicMaterial color="#facc15" transparent opacity={isDead ? 0.15 : 0.65} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#facc15" transparent opacity={0.65} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* ── Core Beacon Point Light (off for the dead sector) ── */}
-      <pointLight position={[0, 5.6, 0]} color={mainColor} intensity={isDead ? 0 : isActive ? 4.5 : 2.5} distance={22} />
+      {/* ── Core Beacon Point Light ── */}
+      <pointLight position={[0, 5.6, 0]} color={mainColor} intensity={isActive ? 4.5 : 2.5} distance={22} />
     </group>
   );
 };
