@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import { GameState, HudPanelKey, ThemePreset } from './types';
+import { ACTIVE_CHALLENGES, TOTAL_ACTIVE_SECTORS } from './challenges';
+import { FINALE_AUTO_START_DELAY_MS } from './constants';
+import { sound } from '@/components/audio/SoundEffects';
 
 export const useGameStore = create<GameState>((set, get) => ({
   playerPos: [0, 0, 0],
@@ -20,6 +23,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   showDashboard: false,
   notification: null,
   finaleState: 'idle',
+  downloadedFragmentIds: [],
   teleportNonce: 0,
   cameraMode: 'chase',
   hudPanels: { topBar: true, strip: true, cockpit: true, radar: true },
@@ -33,8 +37,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   setSelectedEvidenceImage: (img) => set({ selectedEvidenceImage: img }),
   
   setActiveBuilding: (id) => {
-    // SEC-05 is a dead sector — its CTF terminal was removed, so it never opens.
-    if (id === 'building-5') return;
     set({ 
       activeBuildingId: id,
       isTerminalOpen: id !== null,
@@ -68,10 +70,21 @@ export const useGameStore = create<GameState>((set, get) => ({
         activeTerminalTab: 'fragment'
       });
 
-      if (nextCleared.length === 5 && get().finaleState === 'idle') {
+      const liveCleared = nextCleared.filter((clearedId) =>
+        ACTIVE_CHALLENGES.some((c) => c.id === clearedId)
+      ).length;
+
+      // Every live sector cleared -> kick off the ray-convergence finale.
+      if (liveCleared >= TOTAL_ACTIVE_SECTORS && get().finaleState === 'idle') {
         setTimeout(() => {
-          set({ showMasterModal: true });
-        }, 1200);
+          const stillComplete =
+            get().clearedBuildingIds.filter((clearedId) =>
+              ACTIVE_CHALLENGES.some((c) => c.id === clearedId)
+            ).length >= TOTAL_ACTIVE_SECTORS;
+          if (!stillComplete || get().finaleState !== 'idle') return;
+          sound.playMasterVictory();
+          get().startFinale();
+        }, FINALE_AUTO_START_DELAY_MS);
       }
     }
   },
@@ -97,6 +110,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     }),
 
   beginFinaleRedirect: () => set({ finaleState: 'redirecting' }),
+
+  returnToArena: () => set({ finaleState: 'idle' }),
+
+  markFragmentDownloaded: (fragmentId) =>
+    set((s) =>
+      s.downloadedFragmentIds.includes(fragmentId)
+        ? s
+        : { downloadedFragmentIds: [...s.downloadedFragmentIds, fragmentId] }
+    ),
 
   requestTeleport: (pos) =>
     set((s) => ({ playerPos: pos, teleportNonce: s.teleportNonce + 1 })),
@@ -124,6 +146,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       showDashboard: false,
       notification: null,
       finaleState: 'idle',
+      downloadedFragmentIds: [],
     });
   }
 }));

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
-  <rect width="800" height="600" fill="#2e1065"/>
-  <rect x="30" y="30" width="740" height="540" rx="12" fill="none" stroke="#c084fc" stroke-width="2" stroke-dasharray="10 6"/>
-  <text x="60" y="80" font-family="monospace" font-size="14" fill="#c084fc">SECTOR 05 // PROVENANCE-TRACE</text>
-  <text x="60" y="290" font-family="monospace" font-size="34" font-weight="bold" fill="#f8fafc">CERTIFICATE PAIR RECOVERED</text>
-  <text x="60" y="330" font-family="monospace" font-size="16" fill="#c084fc">Two copies - one was edited</text>
-  <text x="60" y="540" font-family="monospace" font-size="12" fill="#94a3b8">MANU ARCHIVE COUNCIL // ORANGE ZONE FORENSICS</text>
-</svg>

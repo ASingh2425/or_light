@@ -16,7 +16,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useGameStore } from '@/lib/store';
-import { FORENSIC_CHALLENGES } from '@/lib/challenges';
+import { ACTIVE_CHALLENGES, TOTAL_ACTIVE_SECTORS } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
 import { sound } from '@/components/audio/SoundEffects';
 
@@ -28,14 +28,17 @@ export const DashboardModal: React.FC = () => {
   const setActiveBuilding = useGameStore((state) => state.setActiveBuilding);
   const setActiveWaypoint = useGameStore((state) => state.setActiveWaypoint);
   const setNotification = useGameStore((state) => state.setNotification);
+  const markFragmentDownloaded = useGameStore((state) => state.markFragmentDownloaded);
   const soundEnabled = useGameStore((state) => state.soundEnabled);
   const themePreset = useGameStore((state) => state.themePreset);
   const theme = THEMES[themePreset] || THEMES['cyberpunk-neon'];
 
   if (!showDashboard) return null;
 
-  const totalBuildings = FORENSIC_CHALLENGES.length;
-  const clearedCount = clearedBuildingIds.length;
+  const totalBuildings = TOTAL_ACTIVE_SECTORS;
+  const clearedCount = clearedBuildingIds.filter((id) =>
+    ACTIVE_CHALLENGES.some((c) => c.id === id)
+  ).length;
   const percentage = Math.round((clearedCount / totalBuildings) * 100);
   const totalRecoveredRows = clearedCount * 90;
 
@@ -47,7 +50,7 @@ export const DashboardModal: React.FC = () => {
     } else {
       // Locked sector: guide the driver instead of opening remotely
       setActiveWaypoint(id);
-      const b = FORENSIC_CHALLENGES.find((x) => x.id === id);
+      const b = ACTIVE_CHALLENGES.find((x) => x.id === id);
       setNotification({
         message: `SEC-0${b?.buildingNumber ?? '?'} locked — drive the car to this building to open its terminal.`,
         type: 'info',
@@ -55,7 +58,12 @@ export const DashboardModal: React.FC = () => {
     }
   };
 
-  const handleDownloadFragment = (e: React.MouseEvent, url: string, fname: string) => {
+  const handleDownloadFragment = (
+    e: React.MouseEvent,
+    url: string,
+    fname: string,
+    fragmentId?: number
+  ) => {
     e.stopPropagation();
     if (soundEnabled) sound.playClick();
     const link = document.createElement('a');
@@ -64,6 +72,7 @@ export const DashboardModal: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    if (fragmentId !== undefined) markFragmentDownloaded(fragmentId);
   };
 
   return (
@@ -135,7 +144,9 @@ export const DashboardModal: React.FC = () => {
                 {totalRecoveredRows} <span className="text-xs text-gray-400 font-normal">/ 450</span>
               </div>
               <div className="text-[10px] text-gray-400">
-                {5 - clearedCount} fragments encrypted
+                {clearedCount < totalBuildings
+                  ? `${totalBuildings - clearedCount} fragments encrypted`
+                  : 'Master archive ready (450)'}
               </div>
             </div>
 
@@ -145,7 +156,7 @@ export const DashboardModal: React.FC = () => {
                 <ShieldCheck className="w-3.5 h-3.5 text-cyber-cyan" />
               </div>
               <div className="text-xl font-bold text-cyber-cyan">
-                {Math.round((clearedCount / 5) * 99.4)}%
+                {Math.round((clearedCount / totalBuildings) * 99.4)}%
               </div>
               <div className="text-[10px] text-gray-400">
                 SHA-256 Signatures Valid
@@ -158,28 +169,28 @@ export const DashboardModal: React.FC = () => {
                 <BrainCircuit className="w-3.5 h-3.5 text-amber-400" />
               </div>
               <div className="text-xl font-bold text-amber-400">
-                {clearedCount === 5 ? '100% READY' : `${percentage}%`}
+                {clearedCount === totalBuildings ? '100% READY' : `${percentage}%`}
               </div>
               <div className="text-[10px] text-gray-400 truncate">
-                {clearedCount === 5 ? 'Dataset Consolidated' : 'Awaiting Full Assembly'}
+                {clearedCount === totalBuildings ? 'Dataset Consolidated' : 'Awaiting Full Assembly'}
               </div>
             </div>
           </div>
 
-          {/* Section 1: Sector Clearance Matrix (The 5 Archive Buildings) */}
+          {/* Section 1: Sector Clearance Matrix (The live archive buildings) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className={`text-xs font-bold ${theme.uiTextAccentClass} uppercase tracking-wider flex items-center space-x-1.5`}>
                 <Database className="w-3.5 h-3.5" />
-                <span>FORENSIC ARCHIVE SECTOR MATRIX (5 FACILITIES)</span>
+                <span>FORENSIC ARCHIVE SECTOR MATRIX ({totalBuildings} FACILITIES)</span>
               </h3>
               <span className="text-[10px] text-gray-400">
                 Cleared sectors reopen here — reach locked ones by car
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-              {FORENSIC_CHALLENGES.map((bldg) => {
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              {ACTIVE_CHALLENGES.map((bldg) => {
                 const isCleared = clearedBuildingIds.includes(bldg.id);
                 const flag = submittedFlags[bldg.id];
 
@@ -229,7 +240,8 @@ export const DashboardModal: React.FC = () => {
                               handleDownloadFragment(
                                 e,
                                 bldg.datasetFragment.downloadUrl,
-                                bldg.datasetFragment.filename
+                                bldg.datasetFragment.filename,
+                                bldg.datasetFragment.fragmentId
                               )
                             }
                             className="w-full py-1 bg-cyber-green/20 hover:bg-cyber-green/30 border border-cyber-green/60 text-cyber-green hover:text-white rounded text-[10px] font-bold flex items-center justify-center space-x-1 transition-colors"

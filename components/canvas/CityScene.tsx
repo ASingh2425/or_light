@@ -19,13 +19,14 @@ export const CityScene: React.FC = () => {
     <div className="w-full h-full relative">
       <Canvas
         shadows
+        dpr={[1, 1.5]}
         camera={{ position: [0, 22, 24], fov: 45 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
         <Suspense fallback={null}>
           <CityEnvironment />
 
-          {/* Render All 5 Forensic Sector Buildings */}
+          {/* Forensic sector buildings */}
           {FORENSIC_CHALLENGES.map((challenge) => (
             <Building3D
               key={challenge.id}
@@ -38,7 +39,7 @@ export const CityScene: React.FC = () => {
           {/* Building → plaza energy conduits (appear per cleared flag) */}
           <FloorConnections />
 
-          {/* Three wrecked buildings (decor only, no sectors) */}
+          {/* Four wrecks (decor only, no sectors) */}
           <RuinedBuildings />
 
           {/* Controllable Player Avatar */}

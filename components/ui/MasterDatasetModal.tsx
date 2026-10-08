@@ -73,7 +73,7 @@ export const MasterDatasetModal: React.FC = () => {
             <CheckCircle2 className="w-6 h-6 text-cyber-green flex-shrink-0 mt-0.5" />
             <div className="space-y-1">
               <div className="font-bold text-cyber-green text-xs uppercase tracking-wider">
-                All 5 Forensic Archive Nodes Verified & Unlocked
+                All 4 Forensic Archive Nodes Verified & Unlocked
               </div>
               <p className="text-xs text-gray-300 leading-relaxed">
                 You have successfully decrypted the breach logs, restored biometric wrist-tag mappings, validated protective falsification flags, and retrieved the civic transfer manifest. All 450 historical records are now consolidated into the unified master dataset.

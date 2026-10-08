@@ -5,6 +5,7 @@ import { Download, FileSpreadsheet, Eye, ChevronLeft, ChevronRight } from 'lucid
 import { BuildingChallenge } from '@/lib/types';
 import { sound } from '@/components/audio/SoundEffects';
 import { useGameStore } from '@/lib/store';
+import { TOTAL_ACTIVE_SECTORS } from '@/lib/challenges';
 
 interface DatasetViewerProps {
   challenge: BuildingChallenge;
@@ -17,6 +18,7 @@ export const DatasetViewer: React.FC<DatasetViewerProps> = ({ challenge }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 8;
   const soundEnabled = useGameStore((state) => state.soundEnabled);
+  const markFragmentDownloaded = useGameStore((state) => state.markFragmentDownloaded);
 
   const fragment = challenge.datasetFragment;
 
@@ -54,6 +56,7 @@ export const DatasetViewer: React.FC<DatasetViewerProps> = ({ challenge }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    markFragmentDownloaded(fragment.fragmentId);
   };
 
   return (
@@ -66,7 +69,7 @@ export const DatasetViewer: React.FC<DatasetViewerProps> = ({ challenge }) => {
           </div>
           <div>
             <div className="text-xs font-bold text-cyber-green uppercase tracking-wider flex items-center">
-              <span>DECRYPTED FRAGMENT {fragment.fragmentId} OF 5</span>
+              <span>DECRYPTED FRAGMENT {fragment.fragmentId} OF {TOTAL_ACTIVE_SECTORS}</span>
               <span className="ml-2 text-[10px] px-1.5 py-0.2 bg-cyber-green/20 rounded">
                 VERIFIED
               </span>

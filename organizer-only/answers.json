@@ -1,30 +1,30 @@
 {
-  "building-2": {
-    "flag": "LASTDATA{SC-9352}",
+  "building-1": {
+    "flag": "MANU{t1m3st4mp_l5b_h1dd3n_1n_pl41n_s1ght}",
     "decoys": [
-      "LASTDATA{SC-5695}",
-      "LASTDATA{SC-4229}",
-      "LASTDATA{SC-2332}"
+      "MANU{vault_sync_0314}",
+      "STATIC{NUM_NAME_ID_BLOODGROUP}"
+    ]
+  },
+  "building-2": {
+    "flag": "MANU{ROHAN_0335}",
+    "decoys": [
+      "MANU{ILAN_0335}",
+      "MANU{ROHAN_0905}",
+      "MANU{SC-9352}"
     ]
   },
   "building-3": {
-    "flag": "LASTDATA{AGE_SLEEP_SKILL_STRESS_FOCUS}",
+    "flag": "MANU{AGE_SLEEP_SKILL_STRESS_FOCUS}",
     "decoys": [
-      "LASTDATA{AGE_NAME_ID_BLOODGROUP}"
+      "MANU{AGE_NAME_ID_BLOODGROUP}"
     ]
   },
   "building-4": {
-    "flag": "LASTDATA{ration_audit.csv_7dfdbe62}",
+    "flag": "MANU{RATION_AUDIT.CSV_7DFDBE62}",
     "decoys": [
-      "LASTDATA{ration_audit.csv_29ede9a0}",
-      "LASTDATA{gate_log.csv_4e0fce2a}"
-    ]
-  },
-  "building-5": {
-    "flag": "LASTDATA{ROHAN_0335}",
-    "decoys": [
-      "LASTDATA{ILAN_0335}",
-      "LASTDATA{ROHAN_0905}"
+      "MANU{ration_audit.csv_29ede9a0}",
+      "MANU{gate_log.csv_4e0fce2a}"
     ]
   }
 }

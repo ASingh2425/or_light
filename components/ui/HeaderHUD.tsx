@@ -22,7 +22,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { useGameStore } from '@/lib/store';
-import { FORENSIC_CHALLENGES } from '@/lib/challenges';
+import { ACTIVE_CHALLENGES, TOTAL_ACTIVE_SECTORS } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
 import { ThemePreset } from '@/lib/types';
 import { sound } from '@/components/audio/SoundEffects';
@@ -86,8 +86,10 @@ export const HeaderHUD: React.FC = () => {
       ? 'strip'
       : 'floating';
 
-  const totalBuildings = FORENSIC_CHALLENGES.length;
-  const clearedCount = clearedBuildingIds.length;
+  const totalBuildings = TOTAL_ACTIVE_SECTORS;
+  const clearedCount = clearedBuildingIds.filter((id) =>
+    ACTIVE_CHALLENGES.some((c) => c.id === id)
+  ).length;
   const percentage = Math.round((clearedCount / totalBuildings) * 100);
   const isComplete = clearedCount === totalBuildings;
 
@@ -106,7 +108,7 @@ export const HeaderHUD: React.FC = () => {
     startFinale();
   };
 
-  // Tab that appears once all 5 flags are captured — triggers the exit sequence
+  // Tab that appears once all live flags are captured — replays the exit sequence
   const finalExitPill = showExitTab && (
     <button
       onClick={handleStartFinale}
@@ -423,7 +425,7 @@ export const HeaderHUD: React.FC = () => {
         {/* Right-edge filler */}
         <div className="flex-1" />
 
-        {/* Final Exit tab (appears at 5/5 flags) */}
+        {/* Final Exit tab (appears at 4/4 flags) */}
         {finalExitPill}
 
         {/* HUD menu (when title bar is hidden) */}

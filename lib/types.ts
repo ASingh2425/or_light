@@ -64,6 +64,8 @@ export interface GameState {
   showDashboard: boolean;
   notification: { message: string; type: 'info' | 'success' | 'warning' } | null;
   finaleState: 'idle' | 'running' | 'redirecting';
+  /** Fragment .csv files the player has downloaded (gates the final exit link). */
+  downloadedFragmentIds: number[];
   teleportNonce: number;
   cameraMode: 'chase' | 'close' | 'wide' | 'top';
   hudPanels: Record<HudPanelKey, boolean>; // true = visible
@@ -88,6 +90,8 @@ export interface GameState {
   setNotification: (notif: { message: string; type: 'info' | 'success' | 'warning' } | null) => void;
   startFinale: () => void;
   beginFinaleRedirect: () => void;
+  returnToArena: () => void;
+  markFragmentDownloaded: (fragmentId: number) => void;
   requestTeleport: (pos: [number, number, number]) => void;
   cycleCameraMode: () => void;
   toggleHudPanel: (key: HudPanelKey) => void;

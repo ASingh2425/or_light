@@ -214,12 +214,23 @@ export const CityEnvironment: React.FC = () => {
             <cylinderGeometry args={[0.15, 0.2, 2.4, 8]} />
             <meshStandardMaterial color="#f59e0b" roughness={0.3} metalness={0.4} />
           </mesh>
-          {/* Strobe Warning Light on Post */}
+          {/* Strobe Warning Light on Post — emissive glow only, no real
+              light (a pointLight per post made every material in the scene
+              evaluate 24 extra lights per fragment) */}
           <mesh position={[0, 2.4, 0]}>
             <sphereGeometry args={[0.2, 12, 12]} />
             <meshBasicMaterial color="#ef4444" />
           </mesh>
-          <pointLight position={[0, 2.4, 0]} color="#ef4444" intensity={0.8} distance={8} />
+          <mesh position={[0, 2.4, 0]}>
+            <sphereGeometry args={[0.45, 10, 10]} />
+            <meshBasicMaterial
+              color="#ef4444"
+              transparent
+              opacity={0.3}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
         </group>
       ))}
 

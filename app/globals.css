@@ -94,23 +94,65 @@ body {
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
 }
 
-/* ── Finale exit sequence ─────────────────────────────────────────── */
-@keyframes finaleFlash {
-  0% { opacity: 0; }
-  45% { opacity: 0.65; }
-  100% { opacity: 1; }
+/* ── Finale portal ──────────────────────────────────────────────── */
+@keyframes finalePanelIn {
+  0% { opacity: 0; transform: translateY(26px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-.finale-flash {
-  background: radial-gradient(circle at 50% 45%, #ffffff 0%, #eafff4 45%, #b9ffdd 100%);
-  animation: finaleFlash 1.3s ease-out forwards;
+.finale-panel-in {
+  animation: finalePanelIn 0.55s 0.12s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-@keyframes finaleRedirectText {
-  0% { opacity: 0; transform: scale(0.85); }
-  40% { opacity: 1; transform: scale(1); }
-  100% { opacity: 1; transform: scale(1.04); }
+/* Flowing rainbow bars + accents */
+@keyframes finaleRainbowFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
-.finale-redirect-text {
-  color: #052e16;
-  animation: finaleRedirectText 1.3s ease-out forwards;
+.finale-rainbow {
+  background-image: linear-gradient(90deg, #ff2d95, #ffd400, #3dff9e, #00d4ff, #a855f7, #ff2d95);
+  background-size: 200% 100%;
+  animation: finaleRainbowFlow 3.5s linear infinite;
+}
+
+/* Breathing colour halo behind the portal panel */
+@keyframes finaleHaloPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.4; }
+  50% { transform: scale(1.07) rotate(8deg); opacity: 0.85; }
+}
+.finale-halo {
+  background: conic-gradient(from 0deg, #ff2d95, #ffd400, #3dff9e, #00d4ff, #a855f7, #ff2d95);
+  animation: finaleHaloPulse 3.2s ease-in-out infinite;
+}
+
+/* Portal warp — plays only while handing off to the next site.
+   Duration must match FINALE_REDIRECT_DELAY_MS (2400ms). */
+@keyframes finaleWarp {
+  0% { opacity: 0; transform: scale(0.55); filter: hue-rotate(0deg) saturate(1); }
+  30% { opacity: 1; transform: scale(1.35); filter: hue-rotate(90deg) saturate(1.35); }
+  65% { opacity: 1; transform: scale(2.6); filter: hue-rotate(240deg) saturate(1.6); }
+  100% { opacity: 1; transform: scale(4.2); filter: hue-rotate(360deg) saturate(1); }
+}
+.finale-warp {
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, #eafff4 12%, #7cf7ff 28%, #ff5ec7 50%, #ffd400 70%, #12071f 100%);
+  animation: finaleWarp 2.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+@keyframes finaleWarpRays {
+  0% { opacity: 0; transform: rotate(0deg) scale(0.4); }
+  35% { opacity: 0.9; transform: rotate(150deg) scale(1.7); }
+  100% { opacity: 0.7; transform: rotate(360deg) scale(3.4); }
+}
+.finale-warp-rays {
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0) 0deg 7deg, rgba(255, 255, 255, 0.6) 7deg 9deg);
+  mix-blend-mode: screen;
+  animation: finaleWarpRays 2.4s linear forwards;
+}
+
+@keyframes finaleCountPop {
+  0% { transform: scale(0.35); opacity: 0; }
+  45% { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.finale-count {
+  animation: finaleCountPop 0.45s ease-out both;
 }

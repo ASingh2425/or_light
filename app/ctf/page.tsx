@@ -2,24 +2,40 @@
 
 import React, { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { ShieldAlert, Terminal, Lock, ChevronRight, FileText, Database, CheckCircle2 } from 'lucide-react';
-import { FORENSIC_CHALLENGES } from '@/lib/challenges';
+import { ShieldAlert, Terminal, Lock, ChevronRight, FileText, Database, CheckCircle2, Loader2 } from 'lucide-react';
+import { ACTIVE_CHALLENGES } from '@/lib/challenges';
 
 function CTFContent() {
   const searchParams = useSearchParams();
   const challengeId = searchParams.get('challenge');
   const [activeChallenge, setActiveChallenge] = useState<string | null>(challengeId || 'building-1');
   const [flag, setFlag] = useState('');
-  const [status, setStatus] = useState<{type: 'idle' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
+  const [status, setStatus] = useState<{type: 'idle' | 'checking' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
 
-  const currentChallenge = FORENSIC_CHALLENGES.find(c => c.id === activeChallenge) || FORENSIC_CHALLENGES[0];
+  const currentChallenge = ACTIVE_CHALLENGES.find(c => c.id === activeChallenge) || ACTIVE_CHALLENGES[0];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Verified server-side against the stored SHA-256 hash (same path as the
+  // in-arena terminal), so every live sector works — not just ones with a
+  // hardcoded defaultFlag.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (flag.trim() === currentChallenge.defaultFlag) {
-      setStatus({ type: 'success', msg: 'Flag accepted! Points awarded.' });
-    } else {
-      setStatus({ type: 'error', msg: 'Incorrect flag. Try again.' });
+    const candidate = flag.trim();
+    if (!candidate) return;
+    setStatus({ type: 'checking', msg: 'Verifying clearance token…' });
+    try {
+      const res = await fetch('/api/verify-flag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buildingId: currentChallenge.id, flag: candidate }),
+      });
+      const data = await res.json();
+      setStatus(
+        data.success
+          ? { type: 'success', msg: data.message || 'Flag accepted! Points awarded.' }
+          : { type: 'error', msg: data.message || 'Incorrect flag. Try again.' }
+      );
+    } catch {
+      setStatus({ type: 'error', msg: 'Verification service unreachable. Try again.' });
     }
   };
 
@@ -52,7 +68,7 @@ function CTFContent() {
           <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-800 pb-2">
             Challenges
           </div>
-          {FORENSIC_CHALLENGES.map((c) => (
+          {ACTIVE_CHALLENGES.map((c) => (
             <button
               key={c.id}
               onClick={() => { setActiveChallenge(c.id); setStatus({type: 'idle', msg: ''}); setFlag(''); }}
@@ -137,19 +153,28 @@ function CTFContent() {
             </div>
             <button 
               type="submit"
-              className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_20px_rgba(0,255,255,0.4)] whitespace-nowrap"
+              disabled={status.type === 'checking' || !flag.trim()}
+              className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_20px_rgba(0,255,255,0.4)] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              SUBMIT
+              {status.type === 'checking' ? 'VERIFYING…' : 'SUBMIT'}
             </button>
           </form>
 
           {status.type !== 'idle' && (
             <div className={`mt-4 p-4 rounded-lg flex items-center gap-3 border ${
-              status.type === 'success' 
-                ? 'bg-green-500/10 border-green-500/50 text-green-400' 
-                : 'bg-red-500/10 border-red-500/50 text-red-400'
+              status.type === 'success'
+                ? 'bg-green-500/10 border-green-500/50 text-green-400'
+                : status.type === 'checking'
+                  ? 'bg-amber-500/10 border-amber-500/50 text-amber-400'
+                  : 'bg-red-500/10 border-red-500/50 text-red-400'
             }`}>
-              {status.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <ShieldAlert className="w-5 h-5" />}
+              {status.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : status.type === 'checking' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <ShieldAlert className="w-5 h-5" />
+              )}
               <span className="text-sm font-bold">{status.msg}</span>
             </div>
           )}

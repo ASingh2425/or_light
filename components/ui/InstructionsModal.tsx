@@ -74,7 +74,7 @@ export const InstructionsModal: React.FC = () => {
               <span>2. FORENSIC TERMINALS</span>
             </div>
             <p className="text-gray-300 leading-relaxed">
-              Approaching any of the 5 archive buildings slides open its dedicated forensic terminal on the right half of your screen. Each facility contains unique breach evidence and log snippets. Sector tabs in the top strip start <span className="text-cyber-orange font-bold">locked</span> — you must drive to a building to open it, and solving its flag unlocks the tab for remote access.
+              Approaching any of the 4 live archive buildings slides open its dedicated forensic terminal on the right half of your screen. Each facility contains unique breach evidence and log snippets. Sector tabs in the top strip start <span className="text-cyber-orange font-bold">locked</span> — you must drive to a building to open it, and solving its flag unlocks the tab for remote access.
             </p>
           </div>
 
@@ -94,7 +94,13 @@ export const InstructionsModal: React.FC = () => {
               <span>4. MASTER ARCHIVE ASSEMBLY</span>
             </div>
             <p className="text-gray-300 leading-relaxed">
-              Once all 5 buildings reach 100% clearance, the complete 450-record dataset is assembled for downstream machine learning survival modeling.
+              Once all 4 live buildings reach 100% clearance the convergence finale
+              fires, and the complete 450-record dataset is assembled for downstream
+              machine learning survival modeling.
+            </p>
+            <p className="text-gray-400 leading-relaxed pt-1">
+              Recover the final fragment .csv from the portal to unlock{' '}
+              <span className="text-cyber-orange font-bold">ENTER NEXT SITE</span>.
             </p>
           </div>
 

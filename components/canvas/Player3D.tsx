@@ -7,6 +7,8 @@ import { useGameStore } from '@/lib/store';
 import { FORENSIC_CHALLENGES } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
 import { pointerState } from '@/lib/inputState';
+import { FINALE_CAM_RADIUS, FINALE_CAM_HEIGHT, FINALE_CAM_FOV, ARENA_WALL_RADIUS } from '@/lib/constants';
+import { RUIN_SITES } from '@/lib/ruins';
 import { sound } from '@/components/audio/SoundEffects';
 
 // Exponential damping helper (frame-rate independent smoothing)
@@ -67,6 +69,8 @@ export const Player3D: React.FC = () => {
   const lookTargetRef = useRef(new THREE.Vector3(0, 1.2, 0));
   const lastDisplaySpeed = useRef(-1);
   const lastHeadingDeg = useRef(0);
+  const lastPublishedPos = useRef(new THREE.Vector3(0, 0.55, 0));
+  const lastPublishedTime = useRef(0);
   const prevLocalFwdSpeed = useRef(0);
   const seenTeleportNonce = useRef(0);
   const finaleOrbitRef = useRef({ angle: 0, initialized: false });
@@ -200,6 +204,8 @@ export const Player3D: React.FC = () => {
       camera.lookAt(lookTargetRef.current);
       setCarSpeed(0);
       lastDisplaySpeed.current = 0;
+      lastPublishedPos.current.set(tx, 0.55, tz);
+      lastPublishedTime.current = state.clock.getElapsedTime();
       return;
     }
 
@@ -222,13 +228,50 @@ export const Player3D: React.FC = () => {
     vel.x = dampAxis(vel.x, dirX * maxSpeed * inputScale, delta);
     vel.z = dampAxis(vel.z, dirZ * maxSpeed * inputScale, delta);
 
-    // ── Position integration with arena clamping ─────────────────────────
+    // ── Position integration with collision ──────────────────────────────
     const pos = meshRef.current.position;
-    pos.x = THREE.MathUtils.clamp(pos.x + vel.x * delta, -60, 60);
-    pos.z = THREE.MathUtils.clamp(pos.z + vel.z * delta, -60, 60);
+    pos.x += vel.x * delta;
+    pos.z += vel.z * delta;
     pos.y = 0.55;
-    if (pos.x === -60 || pos.x === 60) vel.x = 0;
-    if (pos.z === -60 || pos.z === 60) vel.z = 0;
+
+    // Round arena wall on the glowing barricade ring (posts stand at r=78;
+    // the car's center stops at 76 so its nose never reaches them). Cancel
+    // only the outward velocity so the car slides along the wall.
+    const wallR2 = ARENA_WALL_RADIUS * ARENA_WALL_RADIUS;
+    const radial2 = pos.x * pos.x + pos.z * pos.z;
+    if (radial2 > wallR2) {
+      const radial = Math.sqrt(radial2);
+      pos.x = (pos.x / radial) * ARENA_WALL_RADIUS;
+      pos.z = (pos.z / radial) * ARENA_WALL_RADIUS;
+      const wallNx = pos.x / ARENA_WALL_RADIUS;
+      const wallNz = pos.z / ARENA_WALL_RADIUS;
+      const vOut = vel.x * wallNx + vel.z * wallNz;
+      if (vOut > 0) {
+        vel.x -= vOut * wallNx;
+        vel.z -= vOut * wallNz;
+      }
+    }
+
+    // Solid ruins (the broken buildings) — push the car out using the radii
+    // declared in lib/ruins.ts. CTF sector buildings are drive-through by
+    // design: their terminal opens on proximity instead (6.2).
+    for (const site of RUIN_SITES) {
+      const rdx = pos.x - site.x;
+      const rdz = pos.z - site.z;
+      const rd2 = rdx * rdx + rdz * rdz;
+      if (rd2 < site.radius * site.radius) {
+        const rd = Math.sqrt(rd2) || 1e-6;
+        const rnx = rdx / rd;
+        const rnz = rdz / rd;
+        pos.x = site.x + rnx * site.radius;
+        pos.z = site.z + rnz * site.radius;
+        const vIn = vel.x * rnx + vel.z * rnz;
+        if (vIn < 0) {
+          vel.x -= vIn * rnx;
+          vel.z -= vIn * rnz;
+        }
+      }
+    }
 
     const speed = vel.length();
     isMoving.current = speed > 0.3;
@@ -288,8 +331,21 @@ export const Player3D: React.FC = () => {
         (pitchTarget - carBodyRef.current.rotation.x) * smoothFactor(7, delta);
     }
 
-    // ── Publish position to store (only on real movement) ────────────────
-    setPlayerPos([pos.x, pos.y, pos.z]);
+    // ── Publish position to store (only on real movement, max 10 Hz) ─────
+    // Writing every frame notified 4 Building3D components + the MiniMap
+    // ~60x/second even while parked. Gate on actual movement + a 100ms
+    // interval; worst-case staleness is 0.05 world units (proximity radius
+    // is 6.2, minimap blip is cosmetic).
+    const now = state.clock.getElapsedTime();
+    const residual = lastPublishedPos.current.distanceToSquared(pos);
+    if (
+      residual >= 0.0025 &&
+      (now - lastPublishedTime.current >= 0.1 || speed === 0)
+    ) {
+      lastPublishedTime.current = now;
+      lastPublishedPos.current.copy(pos);
+      setPlayerPos([pos.x, pos.y, pos.z]);
+    }
 
     // ── Camera: cinematic orbit over the plaza during finale, else follow ─
     const camBase = camBaseRef.current;
@@ -299,17 +355,18 @@ export const Player3D: React.FC = () => {
         orbit.initialized = true;
         orbit.angle = Math.atan2(camBase.x, camBase.z);
       }
-      orbit.angle += delta * 0.13;
-      const orbitRadius = 46;
+      orbit.angle += delta * 0.09;
+      // Wide crane shot: high and far so every ray + the core stay framed
+      const orbitRadius = FINALE_CAM_RADIUS;
       const targetX = Math.sin(orbit.angle) * orbitRadius;
-      const targetY = 17 + Math.sin(orbit.angle * 0.6) * 2.5;
+      const targetY = FINALE_CAM_HEIGHT + Math.sin(orbit.angle * 0.6) * 3;
       const targetZ = Math.cos(orbit.angle) * orbitRadius;
-      const glide = smoothFactor(2.0, delta);
+      const glide = smoothFactor(2.8, delta);
       camBase.x += (targetX - camBase.x) * glide;
       camBase.y += (targetY - camBase.y) * glide;
       camBase.z += (targetZ - camBase.z) * glide;
       lookTargetRef.current.x += (0 - lookTargetRef.current.x) * glide;
-      lookTargetRef.current.y += (9 - lookTargetRef.current.y) * glide;
+      lookTargetRef.current.y += (8.5 - lookTargetRef.current.y) * glide;
       lookTargetRef.current.z += (0 - lookTargetRef.current.z) * glide;
       camera.position.copy(camBase);
       camera.lookAt(lookTargetRef.current);
@@ -360,7 +417,7 @@ export const Player3D: React.FC = () => {
     const persp = camera as THREE.PerspectiveCamera;
     const targetFov =
       finaleState !== 'idle'
-        ? 50
+        ? FINALE_CAM_FOV
         : isTerminalOpen
           ? 40
           : isNitroActive && speed > 4
@@ -379,8 +436,6 @@ export const Player3D: React.FC = () => {
 
     let nearbyBuilding: string | null = null;
     for (const bldg of FORENSIC_CHALLENGES) {
-      // SEC-05 is a dead sector: no terminal there, so it never triggers.
-      if (bldg.id === 'building-5') continue;
       const dx = pos.x - bldg.coordinates[0];
       const dz = pos.z - bldg.coordinates[2];
       const dist = Math.sqrt(dx * dx + dz * dz);

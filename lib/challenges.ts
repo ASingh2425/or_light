@@ -9,7 +9,6 @@ export const FORENSIC_CHALLENGES: BuildingChallenge[] = [
     coordinates: [-42, 0, -32],
     color: '#ff6600',
     themeColor: 'from-orange-500/20 to-amber-600/10',
-    evidenceImage: '/images/forensic-evidence-1.svg',
     briefing: {
       title: 'The Nightly Archive Sync',
       subtitle: 'Git history forensics — 1,000 sync commits, breach night 2026-09-17',
@@ -34,6 +33,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       formatHint: 'Format: MANU{...}'
     },
     flagHash: 'ab0add65882dac093c7fd192d395d6cb42edb9b1df8914f8490695573e8a3109',
+    defaultFlag: 'MANU{t1m3st4mp_l5b_h1dd3n_1n_pl41n_s1ght}',
     datasetFragment: {
       fragmentId: 1,
       filename: 'fragment_1.csv',
@@ -51,7 +51,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
     coordinates: [42, 0, -32],
     color: '#ff8800',
     themeColor: 'from-amber-500/20 to-orange-600/10',
-    evidenceImage: '/images/forensic-evidence-2.svg',
     briefing: {
       title: 'Fragment Seal 047 Certificate',
       subtitle: 'Forensics // Data provenance',
@@ -87,29 +86,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
         notes: 'Compare the two PDFs side by side — page changes and property changes.'
       },
       {
-        id: 'ev-2-2',
-        title: 'Field Toolkit — Reading PDF Metadata',
-        type: 'record',
-        content: [
-          'exiftool (all platforms):',
-          '  exiftool sealing_certificate_edited.pdf',
-          '  exiftool -a -G1 -s sealing_certificate_edited.pdf',
-          '',
-          'Chrome   : open the PDF -> menu -> Document properties',
-          '           (dates shown in YOUR local timezone)',
-          'Acrobat  : File -> Properties -> Description',
-          '           (dates shown in YOUR local timezone)',
-          'Windows  : right-click the file -> Properties -> Details',
-          '           (Author may appear, depending on your PDF reader;',
-          '            dates are local time)',
-          '',
-          'Compare the two files side by side: what changed on the',
-          'page, and what changed in the properties?',
-          '',
-          'Timezones: UTC = your local time minus your UTC offset.',
-        ].join('\n'),
-      },
-      {
         id: 'att-2-1',
         title: 'Original certificate (PDF)',
         type: 'record',
@@ -142,6 +118,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       formatHint: 'MANU{NAME_HHMM} (UTC)'
     },
     flagHash: 'a2828097ceee05b376adc8af9cbf2ea78e029ab0cbf8da18a51447ea67964ccb',
+    defaultFlag: 'MANU{ROHAN_0335}',
     datasetFragment: {
       fragmentId: 2,
       filename: 'fragment_2.csv',
@@ -159,7 +136,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
     coordinates: [-45, 0, 35],
     color: '#ffaa00',
     themeColor: 'from-yellow-500/20 to-orange-600/10',
-    evidenceImage: '/act3/sealed-features/sealed_plate.png',
     briefing: {
       title: 'The Sealed Feature Manifest',
       subtitle: 'Cryptography // Recovered seal plate',
@@ -203,25 +179,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
         notes: 'Not every cipher-looking string on the plate is the sealed message.'
       },
       {
-        id: 'ev-3-3',
-        title: 'Field Toolkit — Cryptography',
-        type: 'record',
-        content: [
-          'Browser tools (nothing to install):',
-          '  CyberChef (gchq.github.io/CyberChef)',
-          '    - ROT13 / "ROT13 Brute Force" for simple letter shifts',
-          '    - "Vigenere Decode": paste the letters, enter the key',
-          '  dcode.fr -> "Vigenere Cipher" decoder (when the key is known)',
-          '',
-          'Tips:',
-          '  - Spaces between blocks are for reading only; they do NOT',
-          '    use up key letters.',
-          '  - Gibberish output means the KEY is wrong, not the tool.',
-          '  - Not every cipher-looking string on a plate is the sealed',
-          '    message. Ask which one the question is about.',
-        ].join('\n'),
-      },
-      {
         id: 'att-3-1',
         title: 'Seal plate (PNG)',
         type: 'record',
@@ -231,8 +188,7 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
           'Filename : sealed_plate.png',
           'Format   : full-resolution PNG',
           '',
-          'Open it read-only. Click the sector cover image above to',
-          'enlarge it, or download the original file here.',
+          'Open it read-only. Download the original file here.',
         ].join('\n'),
         notes: 'Full-resolution plate image.'
       }
@@ -260,7 +216,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
     coordinates: [45, 0, 35],
     color: '#ff5500',
     themeColor: 'from-orange-600/20 to-red-600/10',
-    evidenceImage: '/images/forensic-evidence-4.svg',
     briefing: {
       title: 'Wing D Audit Export',
       subtitle: 'Forensics // Dataset integrity',
@@ -286,25 +241,6 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
           '    Re-saving rewrites bytes (line endings, number formats)',
           '    and changes every hash: you would destroy the evidence.',
           '  - Unzip, hash the files exactly as they are, then compare.',
-        ].join('\n'),
-      },
-      {
-        id: 'ev-4-2',
-        title: 'Field Toolkit — Hashing a File',
-        type: 'record',
-        content: [
-          'Windows (PowerShell, inside the unzipped folder):',
-          '  Get-FileHash .\\ration_audit.csv -Algorithm SHA256',
-          '  Get-FileHash .\\*.csv -Algorithm SHA256        (all at once)',
-          '',
-          'Linux / macOS:',
-          '  sha256sum *.csv              (macOS: shasum -a 256 *.csv)',
-          '  sha256sum -c manifest.txt    (checks every file for you)',
-          '',
-          'Notes:',
-          '  - Hex case (abc vs ABC) does not matter for the flag.',
-          '  - Compare against manifest.txt, not against your memory of',
-          '    which file "looks" suspicious.',
         ].join('\n'),
       },
       {
@@ -336,51 +272,12 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       rowCount: 90,
       description: 'Historical records for Sanctuary batch 4. Contains social support, quarantine days, and resilience metrics.'
     }
-  },
-  {
-    id: 'building-5',
-    buildingNumber: 5,
-    name: 'Research Evaluation Quarantine Wing',
-    sectorTag: 'SEC-05 / SURVIVAL-GATE',
-    coordinates: [0, 0, 52],
-    color: '#ff3300',
-    themeColor: 'from-amber-600/20 to-orange-700/10',
-    evidenceImage: '/images/forensic-evidence-5.svg',
-    briefing: {
-      title: 'Sealed Historical Survivor Cohort',
-      subtitle: 'Unlocking the Continuous Survival Probability Model Target',
-      storyContext: 'This final vault facility holds the sealed medical records and ground-truth outcomes for all 450 historical survivors. The target variable is continuous survival probability (0.0 to 1.0) rather than a simple binary label—empowering the upcoming ML competition model.',
-      objective: 'Enter the final research clearance key to unlock Fragment 5 and assemble the full 450-record dataset.',
-      loreHint: 'The clearance key confirms the continuous regression target for the Random Forest model.',
-    },
-    evidenceList: [
-      {
-        id: 'ev-5-1',
-        title: 'Research Model Specification',
-        type: 'log',
-        content: `TARGET SPECIFICATION:
-Variable: Survival_Probability (Float 0.000 to 1.000)
-Training Cohort: 450 Historical Records
-Model Architecture: Random Forest Regressor / Gradient Booster
-Clearance Token: MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}
-RESULT: Unlocks Fragment 5 and activates Full Dataset Download.`,
-        notes: 'Final sector unlocking the entire historical archive.'
-      }
-    ],
-    questionPrompt: {
-      text: 'Submit the Research Clearance Token to unlock Dataset Fragment 5 (Records HIST_361 to HIST_450) and complete the Orange Zone!',
-      inputPlaceholder: 'MANU{...}',
-      formatHint: 'Default flag: MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}'
-    },
-    defaultFlag: 'MANU{surv1v4l_pr0b4b1l17y_m0d3l_0k}',
-    flagHash: 'dc0d35afdef497ade2b23d00c05f27a9db02fb34119fde00636b447ba3dcae57',
-    datasetFragment: {
-      fragmentId: 5,
-      filename: 'fragment_5.csv',
-      downloadUrl: '/data/fragments/fragment_5.csv',
-      recordRange: 'HIST_361 — HIST_450',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 5. Completes the 450 dataset with ground truth Survival_Probability.'
-    }
   }
 ];
+
+/** Live CTF sectors — drives the progress bar, dashboard and finale. */
+export const ACTIVE_CHALLENGES: BuildingChallenge[] = FORENSIC_CHALLENGES;
+
+/** Live CTF sectors count. */
+export const TOTAL_ACTIVE_SECTORS = ACTIVE_CHALLENGES.length;
+
