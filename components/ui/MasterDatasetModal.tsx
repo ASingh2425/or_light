@@ -26,8 +26,8 @@ export const MasterDatasetModal: React.FC = () => {
   const handleDownloadMaster = () => {
     if (soundEnabled) sound.playClick();
     const link = document.createElement('a');
-    link.href = '/data/MANU_Historical_Records_Full.csv';
-    link.download = 'MANU_Historical_Records_450_COMPLETE.csv';
+    link.href = '/data/forensics_final.csv';
+    link.download = 'forensics_final_120_COMPLETE.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -76,7 +76,7 @@ export const MasterDatasetModal: React.FC = () => {
                 All 4 Forensic Archive Nodes Verified & Unlocked
               </div>
               <p className="text-xs text-gray-300 leading-relaxed">
-                You have successfully decrypted the breach logs, restored biometric wrist-tag mappings, validated protective falsification flags, and retrieved the civic transfer manifest. All 450 historical records are now consolidated into the unified master dataset.
+                You have successfully decrypted the breach logs, restored biometric wrist-tag mappings, validated protective falsification flags, and retrieved the civic transfer manifest. All 120 records are now consolidated into the unified master dataset.
               </p>
             </div>
           </div>
@@ -85,7 +85,7 @@ export const MasterDatasetModal: React.FC = () => {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 bg-cyber-dark/80 border border-cyber-border/40 rounded-lg">
               <div className="text-[10px] text-gray-400 uppercase">Total Records</div>
-              <div className="text-lg font-bold text-cyber-orange">450 Rows</div>
+              <div className="text-lg font-bold text-cyber-orange">120 Rows</div>
             </div>
             <div className="p-3 bg-cyber-dark/80 border border-cyber-border/40 rounded-lg">
               <div className="text-[10px] text-gray-400 uppercase">Features</div>
@@ -104,7 +104,7 @@ export const MasterDatasetModal: React.FC = () => {
               <span>HANDOFF TO MACHINE LEARNING MODELING PHASE:</span>
             </div>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Use this complete 450-record dataset to train your regression model (e.g. Random Forest / XGBoost) predicting continuous survival probabilities for current Sanctuary candidates.
+              Use this complete 120-record dataset to train your regression model (e.g. Random Forest / XGBoost) predicting continuous survival probabilities for current Sanctuary candidates.
             </p>
           </div>
 

@@ -141,12 +141,12 @@ export const DashboardModal: React.FC = () => {
                 <Database className={`w-3.5 h-3.5 ${theme.uiTextAccentClass}`} />
               </div>
               <div className="text-xl font-bold text-white">
-                {totalRecoveredRows} <span className="text-xs text-gray-400 font-normal">/ 450</span>
+                {totalRecoveredRows} <span className="text-xs text-gray-400 font-normal">/ 120</span>
               </div>
               <div className="text-[10px] text-gray-400">
                 {clearedCount < totalBuildings
                   ? `${totalBuildings - clearedCount} fragments encrypted`
-                  : 'Master archive ready (450)'}
+                  : 'Master archive ready (120)'}
               </div>
             </div>
 
@@ -272,7 +272,7 @@ export const DashboardModal: React.FC = () => {
                 <span>DOWNSTREAM ML MODEL SPECIFICATIONS</span>
               </div>
               <p className="text-xs text-gray-300 leading-relaxed">
-                The objective of the machine learning phase is to train a regression model (e.g. Random Forest Regressor) on the reconstructed 450 historical records to predict continuous survival probabilities (0.0 to 1.0) for active Sanctuary residents.
+                The objective of the machine learning phase is to train a regression model (e.g. Random Forest Regressor) on the reconstructed 120 records to predict continuous survival probabilities (0.0 to 1.0) for active Sanctuary residents.
               </p>
               
               <div className="space-y-1.5 font-mono text-[11px] bg-cyber-darker/60 p-3 rounded-lg border border-gray-800">
@@ -282,7 +282,7 @@ export const DashboardModal: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Total Records:</span>
-                  <span className="text-white font-bold">450 Cohort Entries</span>
+                  <span className="text-white font-bold">120 Cohort Entries</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Feature Count:</span>

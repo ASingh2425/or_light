@@ -209,7 +209,7 @@ export const Player3D: React.FC = () => {
       return;
     }
 
-    // ── Input (world-aligned, normalized diagonals) ──────────────────────
+    // ── Input (camera-relative: keys always mean screen directions) ──────────
     const keys = keysPressed.current;
     let dirX = 0;
     let dirZ = 0;
@@ -217,6 +217,19 @@ export const Player3D: React.FC = () => {
     if (keys['s'] || keys['arrowdown'])  dirZ += 1;
     if (keys['a'] || keys['arrowleft'])  dirX -= 1;
     if (keys['d'] || keys['arrowright']) dirX += 1;
+
+    // Rotate input so it's relative to where the camera is actually looking
+    // (smoothed yaw, not the drag target, so steering is stable mid-drag).
+    if (dirX !== 0 || dirZ !== 0) {
+      const camYaw = camCtlRef.current.yaw;
+      const cos = Math.cos(camYaw);
+      const sin = Math.sin(camYaw);
+      const worldX = dirX * cos - dirZ * sin;
+      const worldZ = dirX * sin + dirZ * cos;
+      dirX = worldX;
+      dirZ = worldZ;
+    }
+
     if (dirX !== 0 && dirZ !== 0) {
       dirX *= 0.7071;
       dirZ *= 0.7071;

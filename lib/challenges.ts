@@ -38,9 +38,9 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       fragmentId: 1,
       filename: 'fragment_1.csv',
       downloadUrl: '/data/fragments/fragment_1.csv',
-      recordRange: 'HIST_001 — HIST_090',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 1. Contains baseline health, stress, and immunity metrics.'
+      recordRange: 'SANC-0001 — SANC-0030',
+      rowCount: 30,
+      description: 'Sanctuary transfer manifest batch 1. Contains original identity fields, record alteration flags, and authenticity scores.'
     }
   },
   {
@@ -123,9 +123,9 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       fragmentId: 2,
       filename: 'fragment_2.csv',
       downloadUrl: '/data/fragments/fragment_2.csv',
-      recordRange: 'HIST_091 — HIST_180',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 2. Contains hydration, nutrition, and fitness index metrics.'
+      recordRange: 'SANC-0031 — SANC-0060',
+      rowCount: 30,
+      description: 'Sanctuary transfer manifest batch 2. Contains vault case IDs, transfer manifest IDs, and signature verification flags.'
     }
   },
   {
@@ -203,9 +203,9 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       fragmentId: 3,
       filename: 'fragment_3.csv',
       downloadUrl: '/data/fragments/fragment_3.csv',
-      recordRange: 'HIST_181 — HIST_270',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 3. Contains technical skills, navigation, and teamwork scores.'
+      recordRange: 'SANC-0061 — SANC-0090',
+      rowCount: 30,
+      description: 'Sanctuary transfer manifest batch 3. Contains PRALAYA alteration types, identity mapping confidence, and falsification flags.'
     }
   },
   {
@@ -268,9 +268,9 @@ git clone https://github.com/Hritik-1810/Orange_zone_archieve.git`
       fragmentId: 4,
       filename: 'fragment_4.csv',
       downloadUrl: '/data/fragments/fragment_4.csv',
-      recordRange: 'HIST_271 — HIST_360',
-      rowCount: 90,
-      description: 'Historical records for Sanctuary batch 4. Contains social support, quarantine days, and resilience metrics.'
+      recordRange: 'SANC-0091 — SANC-0120',
+      rowCount: 30,
+      description: 'Sanctuary transfer manifest batch 4. Contains medical tag IDs, community standing, and transfer reason records.'
     }
   }
 ];
