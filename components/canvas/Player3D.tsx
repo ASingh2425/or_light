@@ -14,16 +14,17 @@ import { sound } from '@/components/audio/SoundEffects';
 // Exponential damping helper (frame-rate independent smoothing)
 const smoothFactor = (rate: number, delta: number) => 1 - Math.exp(-rate * delta);
 
-// ── Car handling tuning ────────────────────────────────────────────────────
-const MAX_SPEED = 22;            // world units / second (was 13.5)
-const NITRO_MULTIPLIER = 2.08;   // top speed x this while nitro is held
-const ACCEL_RATE = 4.0;          // how quickly speed ramps up
-const BRAKE_RATE = 6.5;          // how quickly speed drops / reverses
-const TURN_RATE = 9.0;           // how quickly the car swings toward the aimed direction
-const STEER_VISUAL = 0.45;       // front-wheel visual angle
-// Displayed km/h = world speed x this. 22 x 3.5 = ~77 km/h normal,
-// nitro 22 x 2.08 x 3.5 = ~160 km/h.
-const SPEED_DISPLAY = 3.5;
+// Velocity axis controller: gentle ramp when accelerating, firm stop when braking
+const dampAxis = (current: number, target: number, delta: number) => {
+  const rising =
+    target !== 0 &&
+    Math.abs(target) > Math.abs(current) &&
+    Math.sign(target) === Math.sign(current || target);
+  const rate = rising ? 3.0 : 5.5;
+  let value = current + (target - current) * smoothFactor(rate, delta);
+  if (target === 0 && Math.abs(value) < 0.07) value = 0;
+  return value;
+};
 
 // Camera presets (distance + elevation angle around the car)
 const CAM_PRESETS: Record<string, { dist: number; pitch: number }> = {
@@ -65,7 +66,6 @@ export const Player3D: React.FC = () => {
   const isMoving = useRef(false);
   const steerAngle = useRef(0);
   const velocityRef = useRef(new THREE.Vector3(0, 0, 0));
-  const speedRef = useRef(0);
   const lookTargetRef = useRef(new THREE.Vector3(0, 1.2, 0));
   const lastDisplaySpeed = useRef(-1);
   const lastHeadingDeg = useRef(0);
@@ -195,7 +195,6 @@ export const Player3D: React.FC = () => {
       const [tx, , tz] = storeState.playerPos;
       meshRef.current.position.set(tx, 0.55, tz);
       vel.set(0, 0, 0);
-      speedRef.current = 0;
       steerAngle.current = 0;
       prevLocalFwdSpeed.current = 0;
       lastTriggeredBuilding.current = null;
@@ -212,60 +211,35 @@ export const Player3D: React.FC = () => {
 
     // ── Input (camera-relative: keys always mean screen directions) ──────────
     const keys = keysPressed.current;
-    let fwd = 0;
-    let strafeRight = 0;
-    if (keys['w'] || keys['arrowup'])    fwd += 1;
-    if (keys['s'] || keys['arrowdown'])  fwd -= 1;
-    if (keys['d'] || keys['arrowright']) strafeRight += 1;
-    if (keys['a'] || keys['arrowleft'])  strafeRight -= 1;
+    let dirX = 0;
+    let dirZ = 0;
+    if (keys['w'] || keys['arrowup'])    dirZ -= 1;
+    if (keys['s'] || keys['arrowdown'])  dirZ += 1;
+    if (keys['a'] || keys['arrowleft'])  dirX -= 1;
+    if (keys['d'] || keys['arrowright']) dirX += 1;
+
+    // Rotate input so it's relative to where the camera is actually looking
+    // (smoothed yaw, not the drag target, so steering is stable mid-drag).
+    if (dirX !== 0 || dirZ !== 0) {
+      const camYaw = camCtlRef.current.yaw;
+      const cos = Math.cos(camYaw);
+      const sin = Math.sin(camYaw);
+      const worldX = dirX * cos - dirZ * sin;
+      const worldZ = dirX * sin + dirZ * cos;
+      dirX = worldX;
+      dirZ = worldZ;
+    }
+
+    if (dirX !== 0 && dirZ !== 0) {
+      dirX *= 0.7071;
+      dirZ *= 0.7071;
+    }
 
     // Hands off the wheel while the forensic terminal is open or finale runs
     const inputScale = isTerminalOpen || finaleState !== 'idle' ? 0 : 1;
-
-    // Map WASD onto the camera's on-screen axes so the car drives where the
-    // camera is actually looking (mouse orbit = steer direction):
-    //   camera forward (into screen) = (-sin(yaw), -cos(yaw))
-    //   camera right   (screen right) = ( cos(yaw), -sin(yaw))
-    const camYaw = camCtlRef.current.yaw;
-    const cyS = Math.sin(camYaw);
-    const cyC = Math.cos(camYaw);
-    const wishX = fwd * -cyS + strafeRight * cyC;
-    const wishZ = fwd * -cyC + strafeRight * -cyS;
-    const wishMag = Math.hypot(wishX, wishZ);
-
-    const maxSpeed = MAX_SPEED * (isNitroActive ? NITRO_MULTIPLIER : 1.0);
-    // S alone = straight reverse (face forward, back up). S + A/D = drive
-    // diagonally between the two keys (back-left / back-right).
-    const reversing = fwd < 0 && strafeRight === 0;
-
-    let targetSpeed = 0;
-    if (wishMag > 0.001 && inputScale !== 0) {
-      if (reversing) {
-        targetSpeed = -maxSpeed;
-        // Face up-screen (camera-forward) and travel camera-backward.
-        const camForwardHeading = Math.atan2(-cyS, -cyC);
-        let diff = camForwardHeading - meshRef.current.rotation.y;
-        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-        meshRef.current.rotation.y += diff * smoothFactor(TURN_RATE, delta);
-      } else {
-        targetSpeed = maxSpeed * Math.min(1, wishMag);
-        // Swing the car's facing toward the aimed direction (shortest arc).
-        const desiredHeading = Math.atan2(wishX, wishZ);
-        let diff = desiredHeading - meshRef.current.rotation.y;
-        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-        meshRef.current.rotation.y += diff * smoothFactor(TURN_RATE, delta);
-      }
-    }
-
-    // Speed eases toward the target: quicker to slow down than to speed up.
-    const speedRate =
-      Math.abs(targetSpeed) > Math.abs(speedRef.current) ? ACCEL_RATE : BRAKE_RATE;
-    speedRef.current += (targetSpeed - speedRef.current) * smoothFactor(speedRate, delta);
-    if (targetSpeed === 0 && Math.abs(speedRef.current) < 0.06) speedRef.current = 0;
-
-    // The car always drives along the direction it is facing (no sideways slide).
-    const faceY = meshRef.current.rotation.y;
-    vel.set(Math.sin(faceY) * speedRef.current, 0, Math.cos(faceY) * speedRef.current);
+    const maxSpeed = 13.5 * (isNitroActive ? 2.1 : 1.0);
+    vel.x = dampAxis(vel.x, dirX * maxSpeed * inputScale, delta);
+    vel.z = dampAxis(vel.z, dirZ * maxSpeed * inputScale, delta);
 
     // ── Position integration with collision ──────────────────────────────
     const pos = meshRef.current.position;
@@ -312,30 +286,33 @@ export const Player3D: React.FC = () => {
       }
     }
 
-    // Fold collision response back into the scalar speed (signed along facing)
-    speedRef.current =
-      vel.x * Math.sin(meshRef.current.rotation.y) +
-      vel.z * Math.cos(meshRef.current.rotation.y);
-
     const speed = vel.length();
     isMoving.current = speed > 0.3;
 
     // Speedometer — only push integer changes to the store
-    const displaySpeed = Math.round(speed * SPEED_DISPLAY);
+    const displaySpeed = Math.round(speed * 5.5);
     if (displaySpeed !== lastDisplaySpeed.current) {
       lastDisplaySpeed.current = displaySpeed;
       setCarSpeed(displaySpeed);
     }
 
-    // ── Front wheel steering (smoothed visual) ────────────────────────────
-    const targetSteer = inputScale !== 0 ? -strafeRight * STEER_VISUAL : 0;
+    // ── Front wheel steering (smoothed) ───────────────────────────────────
+    let targetSteer = 0;
+    if (inputScale !== 0) {
+      if (keys['a'] || keys['arrowleft'])  targetSteer = 0.45;
+      if (keys['d'] || keys['arrowright']) targetSteer = -0.45;
+    }
     steerAngle.current += (targetSteer - steerAngle.current) * smoothFactor(9, delta);
 
     if (wheelFLRef.current) wheelFLRef.current.rotation.y = steerAngle.current;
     if (wheelFRRef.current) wheelFRRef.current.rotation.y = steerAngle.current;
 
-    // ── Heading: publish facing to the store (movement already drives it) ──
-    {
+    // ── Heading: shortest-arc damping toward velocity (no 180° snap) ─────
+    if (speed > 0.3) {
+      const targetAngle = Math.atan2(vel.x, vel.z);
+      let diff = targetAngle - meshRef.current.rotation.y;
+      diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+      meshRef.current.rotation.y += diff * smoothFactor(7, delta);
       const headingDeg = Math.round((meshRef.current.rotation.y * 180) / Math.PI);
       if (headingDeg !== lastHeadingDeg.current) {
         lastHeadingDeg.current = headingDeg;
