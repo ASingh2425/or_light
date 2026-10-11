@@ -25,6 +25,7 @@ import { useGameStore } from '@/lib/store';
 import { ACTIVE_CHALLENGES } from '@/lib/challenges';
 import { FINAL_REDIRECT_URL, FINALE_REDIRECT_DELAY_MS } from '@/lib/constants';
 import { sound } from '@/components/audio/SoundEffects';
+import { syncOrangeZoneToSupabase } from '@/lib/supabaseSync';
 
 // The fragment produced by the 4th CTF — the redirect stays locked until it
 // has been downloaded.
@@ -45,7 +46,11 @@ export const FinaleOverlay: React.FC = () => {
   // The overlay stays mounted between finales — clear a pending hand-off so a
   // replayed exit sequence starts from a clean slate.
   useEffect(() => {
-    if (finaleState !== 'redirecting') setPhase('idle');
+    if (finaleState === 'redirecting') {
+      syncOrangeZoneToSupabase();
+    } else {
+      setPhase('idle');
+    }
   }, [finaleState]);
 
   // The warp (and only the warp) owns the hand-off: navigation fires once the
@@ -85,10 +90,12 @@ export const FinaleOverlay: React.FC = () => {
     link.click();
     document.body.removeChild(link);
     markFragmentDownloaded(FINAL_FRAGMENT_ID);
+    syncOrangeZoneToSupabase();
   };
 
   const handleRedirect = () => {
     if (!gateOpen || phase === 'warp') return;
+    syncOrangeZoneToSupabase();
     if (soundEnabled) sound.playMasterVictory();
     fireConfetti({
       particleCount: 170,

@@ -1,7 +1,7 @@
 // Destination the finale portal hands the player off to once every live sector
 // is cleared AND the 4th fragment .csv has been downloaded.
 // TODO: swap for the real "next site" URL when provided (placeholder for now).
-export const FINAL_REDIRECT_URL = 'https://example.com';
+export const FINAL_REDIRECT_URL = 'https://orange-to-red-slideshow.vercel.app/transition/radio-forensics';
 
 // Finale timeline (seconds) — must match FinaleSequence.tsx
 export const FINALE_BEAM_DURATION = 2.2; // rays finish growing
