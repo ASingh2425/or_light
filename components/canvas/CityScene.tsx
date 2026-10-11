@@ -18,10 +18,10 @@ export const CityScene: React.FC = () => {
   return (
     <div className="w-full h-full relative">
       <Canvas
-        shadows
-        dpr={[1, 1.5]}
+        shadows="basic"
+        dpr={1}
         camera={{ position: [0, 22, 24], fov: 45 }}
-        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', stencil: false }}
       >
         <Suspense fallback={null}>
           <CityEnvironment />

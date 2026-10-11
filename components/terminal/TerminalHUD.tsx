@@ -15,7 +15,18 @@ import {
   Sparkles,
   ArrowRight
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+type ConfettiFn = (opts?: any) => void;
+let confettiFn: ConfettiFn | null = null;
+async function loadConfetti() {
+  if (!confettiFn) {
+    const mod = await import('canvas-confetti');
+    confettiFn = mod.default as ConfettiFn;
+  }
+  return confettiFn;
+}
+function fireConfetti(opts?: any) {
+  loadConfetti().then((fn) => fn(opts));
+}
 import { useGameStore } from '@/lib/store';
 import { FORENSIC_CHALLENGES } from '@/lib/challenges';
 import { THEMES } from '@/lib/themes';
@@ -103,7 +114,7 @@ export const TerminalHUD: React.FC = () => {
       if (data.success) {
         if (soundEnabled) sound.playSuccess();
         
-        confetti({
+        fireConfetti({
           particleCount: 90,
           spread: 75,
           origin: { y: 0.6 },

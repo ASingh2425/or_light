@@ -124,7 +124,6 @@ const GuttedShell: React.FC = () => {
       <mesh material={soot} position={[0, 7, -2.28]}><boxGeometry args={[3, 2.4, 0.05]} /></mesh>
       <mesh material={slab} position={[2.6, 2.2, 3.4]} rotation={[0.9, 0.2, 0]}><boxGeometry args={[4.6, 0.3, 4.4]} /></mesh>
       {/* embers glowing inside the burnt floors */}
-      <pointLight position={[0, 1.6, 0]} color="#ff7a1a" intensity={2.2} distance={11} />
       <mesh position={[0.6, 0.4, 0.5]}><sphereGeometry args={[0.28, 8, 8]} /><meshBasicMaterial color="#ff6a00" /></mesh>
       <mesh position={[-1.2, 3.6, -0.4]}><sphereGeometry args={[0.2, 8, 8]} /><meshBasicMaterial color="#ff9a30" /></mesh>
       <Rubble n={22} spread={6.2} seed={31} color={0x4d4540} maxSize={0.9} />

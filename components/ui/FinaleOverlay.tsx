@@ -9,7 +9,18 @@ import {
   LogOut,
   Rocket,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+type ConfettiFn = (opts?: any) => void;
+let confettiFn: ConfettiFn | null = null;
+async function loadConfetti() {
+  if (!confettiFn) {
+    const mod = await import('canvas-confetti');
+    confettiFn = mod.default as ConfettiFn;
+  }
+  return confettiFn;
+}
+function fireConfetti(opts?: any) {
+  loadConfetti().then((fn) => fn(opts));
+}
 import { useGameStore } from '@/lib/store';
 import { ACTIVE_CHALLENGES } from '@/lib/challenges';
 import { FINAL_REDIRECT_URL, FINALE_REDIRECT_DELAY_MS } from '@/lib/constants';
@@ -79,13 +90,14 @@ export const FinaleOverlay: React.FC = () => {
   const handleRedirect = () => {
     if (!gateOpen || phase === 'warp') return;
     if (soundEnabled) sound.playMasterVictory();
-    confetti({
+    fireConfetti({
       particleCount: 170,
       spread: 110,
       startVelocity: 42,
       scalar: 1.15,
       origin: { y: 0.55 },
-      colors: ['#ff2d95', '#ffd400', '#3dff9e', '#00d4ff', '#a855f7', '#ffffff'],
+      ticks: 140,
+      colors: ['#22ff88', '#bbffee', '#ffffff'],
     });
     setPhase('warp');
   };

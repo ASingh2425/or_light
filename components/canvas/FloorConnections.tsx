@@ -129,6 +129,9 @@ export const FloorConnections: React.FC = () => {
     const cleared = useGameStore.getState().clearedBuildingIds;
     const finaleActive = useGameStore.getState().finaleState !== 'idle';
 
+    // Nothing drawn before the first clearance: skip all per-lane work.
+    if (cleared.length === 0 && !finaleActive) return;
+
     paths.forEach((path, i) => {
       const target = cleared.includes(path.id) ? 1 : 0;
       const pRef = progressRef.current;

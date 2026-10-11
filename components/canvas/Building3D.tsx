@@ -15,14 +15,13 @@ interface Building3DProps {
   isActive: boolean;
 }
 
-export const Building3D: React.FC<Building3DProps> = ({
+const Building3DComponent: React.FC<Building3DProps> = ({
   challenge,
   isCleared,
   isActive,
 }) => {
   const setActiveBuilding = useGameStore((state) => state.setActiveBuilding);
   const setNotification = useGameStore((state) => state.setNotification);
-  const playerPos = useGameStore((state) => state.playerPos);
   const soundEnabled = useGameStore((state) => state.soundEnabled);
   const themePreset = useGameStore((state) => state.themePreset);
   const theme = THEMES[themePreset] || THEMES['cyberpunk-neon'];
@@ -68,8 +67,9 @@ export const Building3D: React.FC<Building3DProps> = ({
     // Locked sectors only open from physical proximity (same radius the
     // drive-up trigger uses) or once the flag has cleared the building.
     if (!isCleared) {
-      const dx = playerPos[0] - challenge.coordinates[0];
-      const dz = playerPos[2] - challenge.coordinates[2];
+      const p = useGameStore.getState().playerPos;
+      const dx = p[0] - challenge.coordinates[0];
+      const dz = p[2] - challenge.coordinates[2];
       if (Math.sqrt(dx * dx + dz * dz) >= 6.2) {
         setNotification({
           message: `SEC-0${challenge.buildingNumber} locked — drive the car closer to open this terminal.`,
@@ -227,9 +227,10 @@ export const Building3D: React.FC<Building3DProps> = ({
         <ringGeometry args={[6.8, 7.1, 32]} />
         <meshBasicMaterial color="#facc15" transparent opacity={0.65} side={THREE.DoubleSide} />
       </mesh>
-
-      {/* ── Core Beacon Point Light ── */}
-      <pointLight position={[0, 5.6, 0]} color={mainColor} intensity={isActive ? 4.5 : 2.5} distance={22} />
     </group>
   );
 };
+
+// Memoized so parent re-renders (cleared/active changes) don't rebuild the
+// three unchanged sector towers.
+export const Building3D = React.memo(Building3DComponent);

@@ -46,7 +46,7 @@ const additiveMat = (color: string) =>
     side: THREE.DoubleSide,
   });
 
-export const FinaleSequence: React.FC = () => {
+const FinaleEffects: React.FC = () => {
   const finaleState = useGameStore((state) => state.finaleState);
   const beginFinaleRedirect = useGameStore((state) => state.beginFinaleRedirect);
 
@@ -179,7 +179,7 @@ export const FinaleSequence: React.FC = () => {
           mat.opacity = 0;
           continue;
         }
-        mesh.position.copy(ray.curve.getPoint(phase));
+        ray.curve.getPoint(phase, mesh.position);
         mat.opacity = 0.45 + 0.55 * Math.abs(Math.sin(t * 9 + k * 1.7));
         const s = 1 + 0.4 * Math.sin(t * 12 + k);
         mesh.scale.set(s, s, s);
@@ -455,4 +455,12 @@ export const FinaleSequence: React.FC = () => {
       <pointLight ref={flashLightRef} position={CENTER} color="#ccffcc" intensity={0} distance={200} />
     </group>
   );
+};
+
+export const FinaleSequence: React.FC = () => {
+  const finaleState = useGameStore((state) => state.finaleState);
+  // Only build the heavy finale geometry (tubes, halos, materials) once the
+  // sequence actually starts, instead of allocating it on every page load.
+  if (finaleState === 'idle') return null;
+  return <FinaleEffects />;
 };

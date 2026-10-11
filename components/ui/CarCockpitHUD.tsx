@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Zap, Camera, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useGameStore } from '@/lib/store';
 import { THEMES } from '@/lib/themes';
@@ -14,7 +14,6 @@ const CAM_LABELS: Record<string, string> = {
 };
 
 export const CarCockpitHUD: React.FC = () => {
-  const carSpeed = useGameStore((state) => state.carSpeed);
   const isNitroActive = useGameStore((state) => state.isNitroActive);
   const cameraMode = useGameStore((state) => state.cameraMode);
   const cycleCameraMode = useGameStore((state) => state.cycleCameraMode);
@@ -24,6 +23,27 @@ export const CarCockpitHUD: React.FC = () => {
   const theme = THEMES[themePreset] || THEMES['cyberpunk-neon'];
 
   const accent = theme.uiAccentHex;
+
+  // Speed is painted imperatively from the store to avoid per-frame re-renders
+  const speedTextRef = useRef<HTMLSpanElement>(null);
+  const speedBarRef = useRef<HTMLDivElement>(null);
+
+  const paint = useCallback(() => {
+    const speed = useGameStore.getState().carSpeed;
+    if (speedTextRef.current) {
+      speedTextRef.current.textContent = String(speed);
+      speedTextRef.current.className =
+        speed > 50 ? 'text-cyan-300 animate-pulse' : 'text-white';
+    }
+    if (speedBarRef.current) {
+      speedBarRef.current.style.width = `${Math.min(100, (speed / 160) * 100)}%`;
+    }
+  }, []);
+
+  useEffect(() => {
+    paint();
+    return useGameStore.subscribe(paint);
+  }, [paint]);
 
   // Simulate keydown for on-screen touch D-Pad
   const dispatchKey = (key: string, isDown: boolean) => {
@@ -35,7 +55,7 @@ export const CarCockpitHUD: React.FC = () => {
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-20 font-mono select-none flex flex-col items-center">
       {/* Control Console */}
       <div
-        className="px-4 py-2 rounded-2xl backdrop-blur-2xl border-2 flex items-center space-x-3 shadow-2xl transition-all"
+        className="px-4 py-2 rounded-2xl border-2 flex items-center space-x-3 shadow-2xl transition-all"
         style={{
           background: theme.uiPanelBg,
           borderColor: `${accent}70`,
@@ -48,16 +68,15 @@ export const CarCockpitHUD: React.FC = () => {
             SPEED
           </div>
           <div className="text-xl font-black text-white font-mono flex items-baseline space-x-1">
-            <span className={carSpeed > 50 ? 'text-cyan-300 animate-pulse' : 'text-white'}>
-              {carSpeed}
-            </span>
+            <span ref={speedTextRef} className="text-white" />
             <span className="text-[10px] text-gray-400 font-normal">KM/H</span>
           </div>
           {/* Speed Bar */}
           <div className="w-14 h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
             <div
+              ref={speedBarRef}
               className="h-full bg-gradient-to-r from-cyan-400 to-amber-400 transition-all duration-100"
-              style={{ width: `${Math.min(100, (carSpeed / 120) * 100)}%` }}
+              style={{ width: '0%' }}
             />
           </div>
         </div>

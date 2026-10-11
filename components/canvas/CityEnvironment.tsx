@@ -74,24 +74,20 @@ export const CityEnvironment: React.FC = () => {
       <fog attach="fog" args={[theme.fogColor, theme.fogNear, theme.fogFar]} />
 
       {/* Cinematic Forensics Studio Lighting */}
-      <ambientLight intensity={theme.ambientLightIntensity * 1.6} color={theme.ambientLightColor} />
+      <ambientLight intensity={theme.ambientLightIntensity * 1.8} color={theme.ambientLightColor} />
       <directionalLight
         position={[50, 75, 50]}
         intensity={theme.dirLightIntensity * 1.2}
         color={theme.dirLightColor}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={220}
-        shadow-camera-left={-90}
-        shadow-camera-right={90}
-        shadow-camera-top={90}
-        shadow-camera-bottom={-90}
-      />
-      <directionalLight
-        position={[-50, 50, -50]}
-        intensity={1.2}
-        color={theme.spotLightColor}
+        shadow-mapSize-width={512}
+        shadow-mapSize-height={512}
+        shadow-camera-far={200}
+        shadow-camera-left={-80}
+        shadow-camera-right={80}
+        shadow-camera-top={80}
+        shadow-camera-bottom={-80}
+        shadow-bias={-0.0005}
       />
 
       {/* Central Forensic Spotlight */}
@@ -103,7 +99,6 @@ export const CityEnvironment: React.FC = () => {
         penumbra={0.8}
         distance={110}
       />
-      <pointLight position={[0, 20, 0]} intensity={3.5} color={theme.roadColor} distance={90} />
 
       {/* Horizon Sky Panorama Dome (Scale: radius 135, height 80) */}
       <mesh position={[0, 25, 0]}>
@@ -272,7 +267,7 @@ export const CityEnvironment: React.FC = () => {
       {/* ── FAR PERIMETER BACKGROUND MONOLITHS (Pushed to radius 140) ── */}
       {backgroundMonoliths.map((b) => (
         <group key={b.id} position={[b.x, b.height / 2, b.z]}>
-          <mesh receiveShadow castShadow>
+          <mesh receiveShadow>
             <boxGeometry args={[b.width, b.height, b.width]} />
             <meshStandardMaterial
               color={theme.buildingBaseColor}

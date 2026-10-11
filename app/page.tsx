@@ -1,21 +1,37 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { CityCanvas } from '@/components/canvas/CityCanvas';
 import { HeaderHUD } from '@/components/ui/HeaderHUD';
-import { TerminalHUD } from '@/components/terminal/TerminalHUD';
 import { MiniMap } from '@/components/ui/MiniMap';
-import { MasterDatasetModal } from '@/components/ui/MasterDatasetModal';
-import { InstructionsModal } from '@/components/ui/InstructionsModal';
-import { DashboardModal } from '@/components/ui/DashboardModal';
 import { NotificationToast } from '@/components/ui/NotificationToast';
 import { CarCockpitHUD } from '@/components/ui/CarCockpitHUD';
 import { HudMenuPanel } from '@/components/ui/HudMenuPanel';
-import { FontPreviewMenu } from '@/components/ui/FontPreviewMenu';
-import { EvidenceImageModal } from '@/components/ui/EvidenceImageModal';
 import { FinaleOverlay } from '@/components/ui/FinaleOverlay';
 import { useGameStore } from '@/lib/store';
 import { THEMES } from '@/lib/themes';
+
+const TerminalHUD = dynamic(
+  () => import('@/components/terminal/TerminalHUD').then((m) => m.TerminalHUD),
+  { ssr: false }
+);
+const DashboardModal = dynamic(
+  () => import('@/components/ui/DashboardModal').then((m) => m.DashboardModal),
+  { ssr: false }
+);
+const MasterDatasetModal = dynamic(
+  () => import('@/components/ui/MasterDatasetModal').then((m) => m.MasterDatasetModal),
+  { ssr: false }
+);
+const InstructionsModal = dynamic(
+  () => import('@/components/ui/InstructionsModal').then((m) => m.InstructionsModal),
+  { ssr: false }
+);
+const EvidenceImageModal = dynamic(
+  () => import('@/components/ui/EvidenceImageModal').then((m) => m.EvidenceImageModal),
+  { ssr: false }
+);
 
 export default function Home() {
   const setNotification = useGameStore((state) => state.setNotification);
@@ -53,7 +69,6 @@ export default function Home() {
         <>
           <HeaderHUD />
           <HudMenuPanel />
-          <FontPreviewMenu />
           {hudPanels.radar && <MiniMap />}
           {hudPanels.cockpit && <CarCockpitHUD />}
           <TerminalHUD />
